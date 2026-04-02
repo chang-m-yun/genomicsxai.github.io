@@ -19,3 +19,8 @@ resources/_gen/
 
 # Temporary working files
 temp/
+
+# Node.js (test dependencies, not part of Hugo site)
+node_modules/
+package.json
+package-lock.json
