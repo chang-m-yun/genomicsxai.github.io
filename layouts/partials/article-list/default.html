@@ -1,0 +1,8 @@
+{{- $image := partial "helper/image" (dict "Image" .Params.image "Resources" .Resources) -}}
+{{- $cats := slice -}}
+{{- range .GetTerms "categories" -}}
+  {{- $cats = $cats | append (.Title | urlize) -}}
+{{- end -}}
+<article class="{{ if $image }}has-image{{ end }}" data-categories="{{ delimit $cats " " }}">
+    {{ partial "article/components/header" . }}
+</article>

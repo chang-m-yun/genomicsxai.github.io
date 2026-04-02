@@ -1,0 +1,14 @@
+<div class="category-pills" role="group" aria-label="Filter by category">
+  <a href="/" class="category-pills__pill category-pills__pill--active" data-filter="all">All</a>
+  {{- range $cat := slice "Blog Post" "Tutorial" "Perspective" -}}
+    {{- $slug := . | urlize -}}
+    {{- $label := cond (eq . "Blog Post") "Blogs" (cond (eq . "Tutorial") "Tutorials" "Perspectives") -}}
+    {{- $termPage := site.GetPage (printf "/categories/%s" $slug) -}}
+    {{- if $termPage }}
+  <a href="{{ $termPage.Permalink }}" class="category-pills__pill" data-filter="{{ $slug }}">{{ $label }}</a>
+    {{- else }}
+  <span class="category-pills__pill" data-filter="{{ $slug }}">{{ $label }}</span>
+    {{- end -}}
+  {{- end }}
+</div>
+<div class="category-pills__empty-state" aria-live="polite" hidden>No posts in this category yet.</div>
