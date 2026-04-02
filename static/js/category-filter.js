@@ -42,33 +42,29 @@
       // Filter articles
       var visibleCount = 0;
       articles.forEach(function (article) {
-        if (filter === 'all') {
-          article.hidden = false;
-          visibleCount++;
-        } else {
-          var cats = (article.getAttribute('data-categories') || '').split(' ');
-          var matches = cats.indexOf(filter) !== -1;
-          article.hidden = !matches;
-          if (matches) visibleCount++;
-        }
+        var visible = filter === 'all' ||
+          (article.getAttribute('data-categories') || '').split(' ').indexOf(filter) !== -1;
+        article.hidden = !visible;
+        if (visible) visibleCount++;
       });
 
       // Toggle empty state with optional link to taxonomy archive
-      if (emptyState) {
-        if (visibleCount > 0) {
-          emptyState.hidden = true;
-        } else {
-          var archiveHref = btn.getAttribute('data-href');
-          if (archiveHref) {
-            emptyState.innerHTML =
-              'No posts in this category yet. <a href="' + archiveHref + '">Browse all ' +
-              btn.textContent + ' posts</a>';
-          } else {
-            emptyState.textContent = 'No posts in this category yet.';
-          }
-          emptyState.hidden = false;
-        }
+      if (!emptyState) return;
+
+      if (visibleCount > 0) {
+        emptyState.hidden = true;
+        return;
       }
+
+      var archiveHref = btn.getAttribute('data-href');
+      if (archiveHref) {
+        emptyState.innerHTML =
+          'No posts in this category yet. <a href="' + archiveHref + '">Browse all ' +
+          btn.textContent + ' posts</a>';
+      } else {
+        emptyState.textContent = 'No posts in this category yet.';
+      }
+      emptyState.hidden = false;
     });
   });
 })();

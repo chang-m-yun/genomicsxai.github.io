@@ -2,7 +2,10 @@
   <a href="{{ site.Home.RelPermalink }}" class="category-pills__pill category-pills__pill--active" data-filter="all">All</a>
   {{- range $cat := slice "Blog Post" "Tutorial" "Perspective" -}}
     {{- $slug := . | urlize -}}
-    {{- $label := cond (eq . "Blog Post") "Blogs" (cond (eq . "Tutorial") "Tutorials" "Perspectives") -}}
+    {{- $label := "Perspectives" -}}
+    {{- if eq . "Blog Post" }}{{ $label = "Blogs" }}
+    {{- else if eq . "Tutorial" }}{{ $label = "Tutorials" }}
+    {{- end -}}
     {{- $termPage := site.GetPage (printf "/categories/%s" $slug) -}}
     {{- if $termPage }}
   <a href="{{ $termPage.Permalink }}" class="category-pills__pill" data-filter="{{ $slug }}">{{ $label }}</a>

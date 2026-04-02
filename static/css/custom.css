@@ -1038,11 +1038,6 @@ article img {
   color: var(--accent-color);
   border-color: var(--accent-color);
 }
-[data-scheme="dark"] .category-pills__pill--active {
-  background: var(--accent-color, #34495e);
-  color: #fff;
-  border-color: var(--accent-color, #34495e);
-}
 .category-pills__empty-state {
   text-align: center;
   padding: 40px 20px;
