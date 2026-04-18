@@ -16,9 +16,3 @@ author-name:
   orcid: "0000-0000-0000-0000"
   website: ""
   bio: ""
-
-xinming-tu:
-  name: "Xinming Tu"
-  affiliation: "University of Washington"
-  website: ""
-  bio: "Works on genomic foundation models, benchmarking, and reproducible evaluation workflows."
