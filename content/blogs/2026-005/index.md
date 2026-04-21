@@ -4,7 +4,7 @@ title: "Benchmarking AlphaGenome on NVIDIA GPUs: latency, memory, and feasibilit
 image: "cross_gpu_scaling.png"
 math: false
 
-authors: ["Xinming Tu", "Alejandro Buendia"]
+authors: ["Xinming Tu", "Alejandro Buendia", "Anshul Kundaje", "Sara Mostafavi"]
 
 authors_display:
   - name: "Xinming Tu"
@@ -12,6 +12,11 @@ authors_display:
   - name: "Alejandro Buendia"
     affiliation: "Stanford University"
     orcid: "0009-0001-6562-9876"
+  - name: "Anshul Kundaje"
+    affiliation: "Stanford University"
+    orcid: "0000-0003-3084-2287"
+  - name: "Sara Mostafavi"
+    affiliation: "University of Washington"
 
 editor: "Genomics X AI Editors"
 
@@ -20,7 +25,7 @@ categories: ["Blog Post"]
 
 scope: ["insights"]
 audience: ["general"]
-labs: ["Kundaje lab"]
+labs: ["Kundaje lab", "Mostafavi lab"]
 
 status: "submitted"
 revision: 2
