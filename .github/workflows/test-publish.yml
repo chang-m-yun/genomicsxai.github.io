@@ -1,4 +1,4 @@
-name: Test Publish Pipeline
+name: test-publish
 
 on:
   push:
@@ -74,6 +74,18 @@ jobs:
           echo "preview_url=${URL}" >> "$GITHUB_OUTPUT"
           echo "Using preview path ${DEST}"
 
+      - name: Detect available write tokens
+        id: token_flags
+        env:
+          GH_PAGES_TOKEN: ${{ secrets.GH_PAGES_TOKEN }}
+        shell: bash
+        run: |
+          if [ -n "$GH_PAGES_TOKEN" ]; then
+            echo "has_pages_token=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_pages_token=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Ensure blog discussions
         env:
           GH_TOKEN: ${{ secrets.GH_DISCUSSIONS_TOKEN }}
@@ -105,9 +117,15 @@ jobs:
           if [ -n "$INPUT" ]; then
             read -r -a files <<< "$INPUT"
           else
-            git fetch origin main --depth=1
-            BASE=$(git merge-base HEAD origin/main)
-            mapfile -t files < <(git diff --name-only "$BASE" HEAD -- 'content/blogs/*/index.md' | sort)
+            BEFORE="${{ github.event.before }}"
+            AFTER="${{ github.sha }}"
+            if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
+              mapfile -t files < <(git diff --name-only "$BEFORE" "$AFTER" -- 'content/blogs/*/index.md' | sort)
+            else
+              git fetch origin main:refs/remotes/origin/main --depth=1
+              BASE=$(git merge-base HEAD refs/remotes/origin/main)
+              mapfile -t files < <(git diff --name-only "$BASE" HEAD -- 'content/blogs/*/index.md' | sort)
+            fi
           fi
           if [ "${#files[@]}" -eq 0 ]; then
             echo "count=0" >> "$GITHUB_OUTPUT"
@@ -196,7 +214,7 @@ jobs:
           path: data/zenodo.json
 
       - name: Deploy preview to gh-pages
-        if: github.event.inputs.deploy_preview == 'true' && secrets.GH_PAGES_TOKEN != ''
+        if: github.event.inputs.deploy_preview == 'true' && steps.token_flags.outputs.has_pages_token == 'true'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GH_PAGES_TOKEN }}
@@ -206,7 +224,7 @@ jobs:
           keep_files: true
 
       - name: Report missing gh-pages token
-        if: github.event.inputs.deploy_preview == 'true' && secrets.GH_PAGES_TOKEN == ''
+        if: github.event.inputs.deploy_preview == 'true' && steps.token_flags.outputs.has_pages_token != 'true'
         run: |
           echo "GH_PAGES_TOKEN is not configured; skipping preview deploy."
 

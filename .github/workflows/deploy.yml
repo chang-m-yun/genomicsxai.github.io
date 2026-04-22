@@ -28,6 +28,18 @@ jobs:
         with:
           extended: true
 
+      - name: Detect available write tokens
+        id: token_flags
+        env:
+          GH_PAGES_TOKEN: ${{ secrets.GH_PAGES_TOKEN }}
+        shell: bash
+        run: |
+          if [ -n "$GH_PAGES_TOKEN" ]; then
+            echo "has_pages_token=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_pages_token=false" >> "$GITHUB_OUTPUT"
+          fi
+
       # 2.4. Ensure a GitHub Discussion exists for each blog post (for Giscus likes/comments)
       - name: Ensure blog discussions
         env:
@@ -123,7 +135,7 @@ jobs:
 
       # 4. Deploy to GitHub Pages
       - name: Deploy
-        if: secrets.GH_PAGES_TOKEN != ''
+        if: steps.token_flags.outputs.has_pages_token == 'true'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GH_PAGES_TOKEN }}
@@ -133,6 +145,6 @@ jobs:
           keep_files: true
 
       - name: Report missing gh-pages token
-        if: secrets.GH_PAGES_TOKEN == ''
+        if: steps.token_flags.outputs.has_pages_token != 'true'
         run: |
           echo "GH_PAGES_TOKEN is not configured; skipping gh-pages deploy."
