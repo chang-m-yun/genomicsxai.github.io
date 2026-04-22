@@ -20,7 +20,9 @@ scope: ["insights"]
 audience: ["within-field", "general"]
 labs: ["Genomics x AI"]
 
-status: "submitted"
+# Branch-only temporary state for Zenodo sandbox workflow testing.
+# Do not merge this accepted status to main without real editorial approval.
+status: "accepted"
 revision: 1
 
 date_submitted: 2026-02-19
