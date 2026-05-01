@@ -9,7 +9,7 @@
     BLOGS_PATH: 'content/blogs',
     API_BASE: 'https://api.github.com',
     // Set this to your Vercel deployment URL (e.g. https://genomicsxai-submit.vercel.app)
-    AUTH_BASE: '',
+    AUTH_BASE: 'https://genomicsxai-github-io.vercel.app',
     SCOPE_OPTIONS: ['protocols', 'tutorials', 'negative-results', 'discussions', 'insights', 'ideas'],
     AUDIENCE_OPTIONS: ['within-field', 'general', 'intro-to-field'],
     MAX_IMAGE_SIZE: 10 * 1024 * 1024, // 10 MB
