@@ -52,7 +52,7 @@ Include a high-level summary of your post here. Alternatively editors can write 
 
 ---
 
-## Introduction
+## Introduction (or other name for your first section)
 
 Your content here. Use standard Markdown. For images in the post folder:
 
