@@ -8,9 +8,11 @@
 <script data-goatcounter="https://{{ .Site.Params.goatCounterCode }}.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 {{- end -}}
-{{/* Submission form: load js-yaml and form script only on submission-guidelines page */}}
+{{/* Submission form: load js-yaml (self-hosted) and form script only on submission-guidelines page.
+     js-yaml is self-hosted under static/js/js-yaml.min.js (pinned to v4.1.0) so a CDN
+     compromise cannot exfiltrate the OAuth token kept in sessionStorage. */}}
 {{- if eq .RelPermalink "/submission-guidelines/" -}}
-<script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js" defer></script>
+<script src="{{ "js/js-yaml.min.js" | relURL }}" defer></script>
 <script src="{{ "js/submission-form.js" | relURL }}" defer></script>
 {{- end -}}
 {{/* Preview builds: block search engine indexing */}}
