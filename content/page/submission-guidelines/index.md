@@ -19,15 +19,15 @@ The Genomics × AI blog uses a Git-native, PR-based submission workflow. All sub
 2. **Submit Your Post**  
    You'll need a [GitHub account](https://github.com/signup). From there, choose one of two paths:
 
-   **Option A — Use the submission form (recommended if you're not comfortable with Git)**  
-   Scroll to the [form below](#submit-form) and upload your `index.md` and any images. The form will:
+   **Option A — Use the submission form (recommended if you're not familiar with Git)**  
+   Scroll to the [form below](#submit-form) and upload your `index.md` and any images. It will:
    - Validate that your frontmatter has all required fields and correct values
    - Fork the repository to your GitHub account
    - Create a branch, commit your files to `content/blogs/YYYY-NNN/`, and open a pull request — all automatically
 
    On first use, the form will ask you to authorize the **Genomics × AI Submission** OAuth app. The app requests the `public_repo` scope, which lets it create the fork, branch, commit, and PR on your behalf. It cannot read private repositories, modify your account settings, or access any other resources. You can revoke access at any time from your GitHub [Authorized OAuth Apps](https://github.com/settings/applications) page.
 
-   **Option B — Fork and open a PR manually (if you know Git)**  
+   **Option B — Fork and open a PR manually**  
    - [Fork the repository](https://github.com/genomicsxai/genomicsxai.github.io/fork)  
    - Add your post to `content/blogs/YYYY-NNN/index.md`; place all images and assets in the **same folder** (e.g. `content/blogs/YYYY-NNN/figure1.png`)  
    - Your PR must **only** contain files inside `content/blogs/YYYY-NNN/` — do not modify any files outside this folder (no `static/`, `config.toml`, `.github/`, etc.)  
