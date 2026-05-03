@@ -1,3 +1,4 @@
+---
 post_id: "YYYY-NNN"
 title: "Your Post Title"
 
