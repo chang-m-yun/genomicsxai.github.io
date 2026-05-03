@@ -60,6 +60,7 @@ The Genomics × AI blog uses a Git-native, PR-based submission workflow. All sub
    - Use headings, figures, and examples where helpful to improve readability.
    - Cite relevant prior work using hyperlinks or a formal inline citation style, and the inclusion of a references section at the end of the post is encouraged.
    - Ensure that claims are supported by appropriate sources.
+   
 ## What editors look for (high level)
 
 Editors aim to confirm, in a lightweight pass, that your post:
