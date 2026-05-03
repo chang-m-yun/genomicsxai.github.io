@@ -2,7 +2,6 @@
 
 **Architecture:** GitHub Pages + Hugo
 
----
 
 ## 0. Vision
 
@@ -12,7 +11,6 @@ A Git-native, open, reproducible scientific blog for Genomics × AI.
 - **Hugo** = publishing engine (static frontend)  
 - **GitHub Pages** = hosting layer  
 
----
 
 ## 1. System architecture
 
@@ -25,8 +23,8 @@ A Git-native, open, reproducible scientific blog for Genomics × AI.
 | Publishing engine | Hugo | Render blog site |
 | Hosting | GitHub Pages | Public site delivery |
 | Forum | GitHub Discussions | Public community discussion |
+| Submission Form | GitHub Oauth App | Automate `.md` file validation + PR creation |
 
----
 
 ## 2. Roles and permissions
 
@@ -45,7 +43,6 @@ A Git-native, open, reproducible scientific blog for Genomics × AI.
 
 **Implementation:** GitHub branch protection + teams + CODEOWNERS (e.g. `content/blogs/` → @genomicsxai/editors).
 
----
 
 ## 3. Submission workflow
 
@@ -59,14 +56,14 @@ The PR represents the post under review; **merge** means the post goes live.
 
 **Implementation:** GitHub Pull Requests + PULL_REQUEST_TEMPLATE.
 
----
 
 ## 4. Blog post content model
 
-### 4.1 Required frontmatter schema
+### 4.1 Frontmatter
 
-```yaml
----
+All blogs are submitted as markdown files with any desired images. All markdown files should contain the following frontmatter:
+
+```markdown
 post_id: "2026-001"
 title: "Causal Interpretation of Spatial Omics"
 # Taxonomy: author slugs for /authors/<slug>/ (Hugo uses plural key)
@@ -94,47 +91,37 @@ revision_history:
   - version: 2
     date: 2026-02-10
     notes: "Revised per reviewer comments"
----
 ```
 
-**Implementation:**
 
-- Structure: Hugo frontmatter  
-- Validation: GitHub Actions (frontmatter workflow)  
-
----
-
-## 5. Tags system
+### 4.2 Tags
 
 Multiple levels of tagging; the homepage and lists support filtering by these.
 
-### 5.1 Scientific tags (free text)
-
 Examples: `genomics`, `spatial-omics`, `single-cell`, `diffusion-models`, `causal-inference`, `multi-modal`, `foundation-models`.
 
-Frontmatter: `tags: ["genomics", "causal-inference"]`.
+Included in the frontmatter as: `tags: ["genomics", "causal-inference"]`.
 
-### 5.2 Scope
+### 4.3 Scope
 
 Auto-generated taxonomy pages (e.g. `/scope/protocols/`, `/scope/tutorials/`).
 
 Choices: **protocols**, **tutorials**, **negative-results**, **discussions**, **insights**, **ideas**.
 
-### 5.3 Audience
+### 4.4 Audience
 
 Within-field, general, intro-to-field.
 
-### 5.4 Lab
+### 4.5 Lab
 
 Lab of the writer.
 
-### 5.5 Author
+### 4.6 Author
 
 Writer of the post. Author pages at `/authors/<slug>/` (affiliation, ORCID, website, list of posts).
 
-**Implementation:** Hugo taxonomies (`tags`, `scope`, `audience`, `labs`, `authors`, `categories`) + list/term layouts + `data/authors.yaml` for author profiles.
 
----
+**Implementation:** Hugo taxonomies (`tags`, `scope`, `audience`, `labs`, `authors`, `categories`) + list/term layouts + `data/authors.yaml` for author profiles.
 
 ## 6. Peer review state machine
 
@@ -146,7 +133,6 @@ Writer of the post. Author pages at `/authors/<slug>/` (affiliation, ORCID, webs
 | accepted | Approvals met + merge | GitHub |
 | published | CI deploys | GitHub Actions |
 
----
 
 ## 7. Governance
 
@@ -157,7 +143,6 @@ Writer of the post. Author pages at `/authors/<slug>/` (affiliation, ORCID, webs
 5. Editors request changes if needed.  
 6. Editors merge the post.
 
----
 
 ## 8. CI/CD requirements
 
@@ -175,7 +160,6 @@ Writer of the post. Author pages at `/authors/<slug>/` (affiliation, ORCID, webs
 
 **Implementation:** GitHub Actions (e.g. `pr-build`, `frontmatter`, `links`, `deploy`).
 
----
 
 ## 9. Forum and public discussion
 
@@ -195,7 +179,6 @@ GitHub Discussions, categories:
 
 **Implementation:** Hugo partial (e.g. `discuss.html`) + Discussions URL.
 
----
 
 ## 10. Citation mechanism
 
@@ -217,17 +200,9 @@ Rendered via Hugo partial (e.g. `citation.html`).
 
 - GitHub Release on acceptance; archive via Zenodo; store DOI in frontmatter.
 
----
 
-## 11. Author pages
 
-- Auto-generated at `/authors/<slug>/`.  
-- Show: affiliation, website, ORCID, list of posts.  
-- **Implementation:** Hugo taxonomy `authors` + `layouts/authors/term.html` + `data/authors.yaml`.
-
----
-
-## 12. Navigation structure
+## 11. Navigation structure
 
 Main menu:
 
@@ -239,47 +214,10 @@ Main menu:
 
 Implemented via Hugo `config.toml` menu + theme layout.
 
----
 
-## 13. Repository structure
+## 12. Development tracking
 
-```
-.github/
-  PULL_REQUEST_TEMPLATE.md
-  workflows/
-    deploy.yml
-    pr-build.yml
-    frontmatter.yml
-    links.yml
-  CODEOWNERS
-
-content/
-  blogs/YYYY-NNN/index.md
-  forum/_index.md
-  editorial-board/_index.md
-  submission-guidelines/_index.md
-  policies/_index.md
-
-layouts/
-  blogs/single.html
-  authors/term.html
-  partials/
-    citation.html
-    jsonld.html
-    discuss.html
-
-static/
-  bib/   # optional .bib / .ris per post_id
-
-data/
-  authors.yaml
-  blog.yaml
-  editors.json   # optional; populated by deploy workflow from @genomicsxai/editors (set GH_EDITORS_TOKEN with read:org)
-```
-
----
-
-## 14. MVP checklist
+### 12.1 MVP checklist
 
 - [x] PR-based submission workflow  
 - [x] Tags taxonomy (tags, scope, audience, lab, author, categories)  
@@ -291,9 +229,8 @@ data/
 - [x] Author pages  
 - [x] Navigation (Home, Forum, Editorial Board, Submission Guidelines, Policies)  
 
----
 
-## 15. Phase 2 enhancements
+### 12.2 Phase 2 enhancements
 
 - Automated DOI minting (e.g. Zenodo + release).  
 - Reproducibility CI (e.g. notebook execution).  
@@ -303,11 +240,5 @@ data/
 - Generate `static/bib/<post_id>.bib` and `.ris` in CI or via Hugo.
 
 ---
-
-## 16. System summary
-
-- **GitHub** = backend workflow + provenance.  
-- **Hugo** = deterministic publishing engine.  
-- **GitHub Pages** = hosting.
 
 The blog is transparent, version-controlled, reproducible, and community-driven.

@@ -1,9 +1,3 @@
-# Blog post template
-
-Copy this into `content/blogs/YYYY-NNN/index.md` (replace YYYY-NNN with the next post id, e.g. 2026-002). Fill in the frontmatter and replace the body with your post.
-
-```markdown
----
 post_id: "YYYY-NNN"
 title: "Your Post Title"
 # Optional: image filename in the same folder
@@ -66,8 +60,3 @@ Your content here. Use standard Markdown. For images in the post folder:
 ## Section two
 
 ...
-```
-
-See [BLOG_SPEC.md](./BLOG_SPEC.md) for full frontmatter and tag options.
-
-## References
