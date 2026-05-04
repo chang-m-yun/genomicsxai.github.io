@@ -249,6 +249,7 @@ changed.each do |path|
   doi = published["doi"].to_s
   doi_url = published["doi_url"].to_s
   zenodo_url = published["record_url"].to_s
+  zenodo_url = published.dig("links", "html").to_s if zenodo_url.empty?
   deposition_id = published["id"]
 
   revision_map[revision_number.to_s] = {
