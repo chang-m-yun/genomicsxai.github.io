@@ -12,7 +12,12 @@
     // it's not a secret. (The matching client_secret is what's confidential,
     // and Device Flow doesn't need one.)
     // Find this on the App's settings page: https://github.com/organizations/genomicsxai/settings/apps
-    GITHUB_CLIENT_ID: 'Iv23REPLACE_ME_WITH_YOUR_APP_CLIENT_ID',
+    GITHUB_CLIENT_ID: 'Iv23liQAcs7DRzP92ZZz',
+    // CORS bridge for GitHub's OAuth endpoints. GitHub doesn't send
+    // Access-Control-Allow-Origin on /login/device/code or /login/oauth/access_token,
+    // so we proxy them through Vercel. The proxy holds no secrets and no state —
+    // it only forwards POST bodies. See api/oauth/*.js.
+    AUTH_BASE: 'https://genomicsxai-auth.vercel.app',
     SCOPE_OPTIONS: ['protocols', 'tutorials', 'negative-results', 'discussions', 'insights', 'ideas'],
     AUDIENCE_OPTIONS: ['within-field', 'general', 'intro-to-field'],
     MAX_IMAGE_SIZE: 10 * 1024 * 1024, // 10 MB
@@ -31,15 +36,10 @@
   // The browser asks GitHub for a device code + user code, displays the user
   // code, and polls until the user authorizes the device on github.com.
   //
-  // We call GitHub's OAuth endpoints DIRECTLY from the browser. GitHub's
-  // /login/device/code and /login/oauth/access_token used to be CORS-blocked,
-  // but as of recent updates they accept browser requests. If you ever see a
-  // CORS error in the console here, GitHub's policy has flipped back and
-  // you'll need a one-page CORS proxy (see CORS_PROXY notes in the README).
+  // GitHub does not send Access-Control-Allow-Origin on its OAuth endpoints,
+  // so we route the two POSTs through a Vercel CORS bridge. The bridge holds
+  // no secrets and no auth state — it only forwards bodies (see api/oauth/*).
   var Auth = {
-    GITHUB_DEVICE_CODE_URL: 'https://github.com/login/device/code',
-    GITHUB_TOKEN_URL: 'https://github.com/login/oauth/access_token',
-
     getToken: function () { return sessionStorage.getItem('gh_token'); },
     setToken: function (t) { sessionStorage.setItem('gh_token', t); },
     clearToken: function () { sessionStorage.removeItem('gh_token'); },
@@ -50,18 +50,14 @@
     _pollTimer: null,
 
     startDeviceFlow: async function () {
-      var resp = await fetch(this.GITHUB_DEVICE_CODE_URL, {
+      var resp = await fetch(CONFIG.AUTH_BASE + '/api/oauth/device-code', {
         method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        // GitHub Apps don't use OAuth scopes; permissions are declared on the App.
-        body: new URLSearchParams({ client_id: CONFIG.GITHUB_CLIENT_ID }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_id: CONFIG.GITHUB_CLIENT_ID }),
       });
       if (!resp.ok) {
         var err = {};
-        try { err = await resp.json(); } catch (_) {}
+        try { err = await resp.json(); } catch (_) { }
         throw new Error(err.error_description || err.error || ('HTTP ' + resp.status));
       }
       var data = await resp.json();
@@ -84,16 +80,12 @@
             return reject(new Error('Code expired. Please try again.'));
           }
 
-          fetch(self.GITHUB_TOKEN_URL, {
+          fetch(CONFIG.AUTH_BASE + '/api/oauth/poll', {
             method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
               client_id: CONFIG.GITHUB_CLIENT_ID,
               device_code: deviceCode,
-              grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
             }),
           })
             .then(function (r) { return r.json(); })
@@ -665,7 +657,7 @@
 
         // Try to copy the code to clipboard automatically. Best-effort.
         if (device.user_code && navigator.clipboard && window.isSecureContext) {
-          navigator.clipboard.writeText(device.user_code).catch(function () {});
+          navigator.clipboard.writeText(device.user_code).catch(function () { });
         }
 
         await Auth.pollForAuth(device.device_code, device.interval, device.expires_in);
