@@ -17,6 +17,9 @@
     // can fork, which the submission flow requires.
     // Find this on the App's settings page: https://github.com/organizations/genomicsxai/settings/applications
     GITHUB_CLIENT_ID: 'Ov23lipXrX6z7KCV4d2c',
+    // OAuth scope requested via Device Flow. `public_repo` is the minimum
+    // needed to fork a public repo, push branches, and open PRs.
+    OAUTH_SCOPE: 'public_repo',
     // CORS bridge for GitHub's OAuth endpoints. GitHub doesn't send
     // Access-Control-Allow-Origin on /login/device/code or /login/oauth/access_token,
     // so we proxy them through Vercel. The proxy holds no secrets and no state —
@@ -57,7 +60,10 @@
       var resp = await fetch(CONFIG.AUTH_BASE + '/api/oauth/device-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ client_id: CONFIG.GITHUB_CLIENT_ID }),
+        body: JSON.stringify({
+          client_id: CONFIG.GITHUB_CLIENT_ID,
+          scope: CONFIG.OAUTH_SCOPE,
+        }),
       });
       if (!resp.ok) {
         var err = {};
