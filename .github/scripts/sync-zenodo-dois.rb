@@ -6,6 +6,7 @@ require "time"
 require "uri"
 require "yaml"
 require "fileutils"
+require "pathname"
 
 ROOT = File.expand_path("../..", __dir__)
 DATA_PATH = File.join(ROOT, "data", "zenodo.json")
@@ -114,6 +115,43 @@ def api_request(method, url, payload: nil)
   parsed
 end
 
+def api_upload_file(bucket_url, source_path, filename)
+  raise "ZENODO_API_TOKEN is not set" if TOKEN.empty?
+
+  uri = URI("#{bucket_url}/#{URI.encode_www_form_component(filename)}")
+  req = Net::HTTP::Put.new(uri)
+  req["Authorization"] = "Bearer #{TOKEN}"
+  req["Content-Type"] = "application/octet-stream"
+  req.body = File.binread(source_path)
+
+  response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == "https") do |http|
+    http.request(req)
+  end
+
+  body = response.body.to_s
+  parsed = body.empty? ? {} : JSON.parse(body)
+  unless response.code.to_i.between?(200, 299)
+    raise "Zenodo file upload #{filename} failed (#{response.code}): #{parsed}"
+  end
+  parsed
+end
+
+def upload_post_files(draft, post_path, post_id, revision_number)
+  bucket_url = draft.dig("links", "bucket")
+  raise "Zenodo draft response missing bucket link for #{post_id}" unless bucket_url
+
+  post_dir = File.dirname(post_path)
+  base = Pathname.new(post_dir)
+  files = Dir.glob(File.join(post_dir, "*")).select { |file| File.file?(file) }.sort
+  raise "No files found to upload for #{post_id}" if files.empty?
+
+  files.each do |file|
+    relative = Pathname.new(file).relative_path_from(base).to_s
+    filename = "#{post_id}-v#{revision_number}-#{relative}"
+    api_upload_file(bucket_url, file, filename)
+  end
+end
+
 def create_initial_draft(metadata)
   draft = api_request(:post, "#{API_BASE}/deposit/depositions", payload: {})
   update_draft_metadata(draft.fetch("id"), metadata)
@@ -199,10 +237,12 @@ changed.each do |path|
       latest_draft = new_version.dig("links", "latest_draft")
       raise "Zenodo newversion response missing latest_draft for #{post_id}" unless latest_draft
       draft = api_request(:get, latest_draft)
-      update_draft_metadata(draft.fetch("id"), metadata)
+      draft = update_draft_metadata(draft.fetch("id"), metadata)
+      upload_post_files(draft, path, post_id, revision_number)
       publish_draft(draft.fetch("id"))
     else
       draft = create_initial_draft(metadata)
+      upload_post_files(draft, path, post_id, revision_number)
       publish_draft(draft.fetch("id"))
     end
 
