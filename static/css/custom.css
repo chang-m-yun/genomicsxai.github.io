@@ -1143,12 +1143,12 @@ span.category-pills__pill {
   min-width: 78px;
 }
 .category-pills--disciplines {
-  --discipline-accent: #d97706;
+  --discipline-accent: #b45309;
   --discipline-accent-text: #fff;
   gap: 6px;
 }
 [data-scheme="dark"] .category-pills--disciplines {
-  --discipline-accent: #fbbf24;
+  --discipline-accent: #f59e0b;
   --discipline-accent-text: #0f172a;
 }
 .category-pills--disciplines .category-pills__pill {
