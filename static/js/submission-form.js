@@ -31,6 +31,12 @@
     MAX_TOTAL_SIZE: 50 * 1024 * 1024,  // 50 MB
   };
 
+  // ── Discipline slug list (from data/disciplines.yaml, injected by Hugo) ──
+  var DISCIPLINES = (function () {
+    var el = document.getElementById('submit-form__disciplines-data');
+    try { return el ? JSON.parse(el.textContent) : []; } catch (e) { return []; }
+  })();
+
   // ── Utility ──
   function $(sel, ctx) { return (ctx || document).querySelector(sel); }
   function $$(sel, ctx) { return Array.from((ctx || document).querySelectorAll(sel)); }
@@ -305,6 +311,15 @@
 
       if (!fm.labs || (Array.isArray(fm.labs) && fm.labs.length === 0)) {
         errors.labs = 'Lab is required.';
+      }
+
+      if (DISCIPLINES.length) {
+        var disciplineTags = (fm.tags || []).filter(function (t) {
+          return DISCIPLINES.indexOf(t) !== -1;
+        });
+        if (disciplineTags.length === 0) {
+          errors.discipline = 'Select at least one discipline.';
+        }
       }
 
       return errors;
@@ -845,6 +860,14 @@
         if (cb) cb.checked = Array.isArray(fm.audience) && fm.audience.indexOf(opt) !== -1;
       });
 
+      // Discipline checkboxes — pre-check any disciplines already in the uploaded tags
+      var existingTags = (Array.isArray(fm.tags) ? fm.tags : []).map(function (t) {
+        return String(t).toLowerCase();
+      });
+      $$('.submit-form__discipline').forEach(function (cb) {
+        cb.checked = existingTags.indexOf(cb.dataset.slug) !== -1;
+      });
+
       // Math checkbox
       var mathCb = $('#sf-math');
       if (mathCb) mathCb.checked = !!fm.math;
@@ -897,6 +920,12 @@
 
       var tagsVal = ($('#sf-tags') || {}).value || '';
       fm.tags = tagsVal.split(',').map(function (t) { return t.trim().toLowerCase(); }).filter(Boolean);
+
+      // Merge checked discipline slugs into tags (deduplicated, user-typed tags first)
+      $$('.submit-form__discipline:checked').forEach(function (cb) {
+        var slug = cb.dataset.slug;
+        if (slug && fm.tags.indexOf(slug) === -1) fm.tags.push(slug);
+      });
 
       fm.scope = [];
       CONFIG.SCOPE_OPTIONS.forEach(function (opt) {

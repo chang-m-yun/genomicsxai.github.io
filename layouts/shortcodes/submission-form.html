@@ -105,6 +105,17 @@
       </div>
 
       <div class="submit-form__field">
+        <label class="submit-form__label submit-form__label--required">Discipline</label>
+        <span class="submit-form__help">At least one required — promotes your post under the homepage Discipline filter.</span>
+        <div class="submit-form__checkbox-group">
+          {{- range $.Site.Data.disciplines }}
+          <label class="submit-form__checkbox"><input type="checkbox" class="submit-form__editable submit-form__discipline" data-slug="{{ .slug }}" id="sf-discipline-{{ .slug }}"> {{ .label }}</label>
+          {{- end }}
+        </div>
+        <div id="sf-error-discipline" class="submit-form__field-error" hidden></div>
+      </div>
+
+      <div class="submit-form__field">
         <label class="submit-form__label submit-form__label--required" for="sf-labs">Lab</label>
         <input type="text" id="sf-labs" class="submit-form__input submit-form__editable" placeholder="Your Lab Name">
         <div id="sf-error-labs" class="submit-form__field-error" hidden></div>
@@ -167,4 +178,10 @@
     <div id="submit-form__form-error" class="submit-form__message submit-form__message--error" hidden></div>
     <div id="submit-form__success" class="submit-form__message submit-form__message--success" hidden></div>
   </div>
+
+  <script type="application/json" id="submit-form__disciplines-data">
+{{- $slugs := slice -}}
+{{- range $.Site.Data.disciplines }}{{ $slugs = $slugs | append .slug }}{{ end -}}
+{{ $slugs | jsonify }}
+  </script>
 </div>
