@@ -1,0 +1,97 @@
+{
+  "2026-001": {
+    "conceptrecid": "20272897",
+    "current_revision": 1,
+    "current_doi": "10.5281/zenodo.20272898",
+    "current_doi_url": "https://doi.org/10.5281/zenodo.20272898",
+    "current_zenodo_url": "https://zenodo.org/records/20272898",
+    "current_deposition_id": 20272898,
+    "revisions": {
+      "1": {
+        "doi": "10.5281/zenodo.20272898",
+        "doi_url": "https://doi.org/10.5281/zenodo.20272898",
+        "zenodo_url": "https://zenodo.org/records/20272898",
+        "deposition_id": 20272898,
+        "record_id": 20272898,
+        "date": "2026-02-19",
+        "notes": "Initial welcome post"
+      }
+    }
+  },
+  "2026-002": {
+    "conceptrecid": "20272899",
+    "current_revision": 1,
+    "current_doi": "10.5281/zenodo.20272900",
+    "current_doi_url": "https://doi.org/10.5281/zenodo.20272900",
+    "current_zenodo_url": "https://zenodo.org/records/20272900",
+    "current_deposition_id": 20272900,
+    "revisions": {
+      "1": {
+        "doi": "10.5281/zenodo.20272900",
+        "doi_url": "https://doi.org/10.5281/zenodo.20272900",
+        "zenodo_url": "https://zenodo.org/records/20272900",
+        "deposition_id": 20272900,
+        "record_id": 20272900,
+        "date": "2026-02-20",
+        "notes": "Initial submission"
+      }
+    }
+  },
+  "2026-003": {
+    "conceptrecid": "20272903",
+    "current_revision": 1,
+    "current_doi": "10.5281/zenodo.20272904",
+    "current_doi_url": "https://doi.org/10.5281/zenodo.20272904",
+    "current_zenodo_url": "https://zenodo.org/records/20272904",
+    "current_deposition_id": 20272904,
+    "revisions": {
+      "1": {
+        "doi": "10.5281/zenodo.20272904",
+        "doi_url": "https://doi.org/10.5281/zenodo.20272904",
+        "zenodo_url": "https://zenodo.org/records/20272904",
+        "deposition_id": 20272904,
+        "record_id": 20272904,
+        "date": "2026-02-25",
+        "notes": "Initial submission"
+      }
+    }
+  },
+  "2026-004": {
+    "conceptrecid": "20272905",
+    "current_revision": 1,
+    "current_doi": "10.5281/zenodo.20272906",
+    "current_doi_url": "https://doi.org/10.5281/zenodo.20272906",
+    "current_zenodo_url": "https://zenodo.org/records/20272906",
+    "current_deposition_id": 20272906,
+    "revisions": {
+      "1": {
+        "doi": "10.5281/zenodo.20272906",
+        "doi_url": "https://doi.org/10.5281/zenodo.20272906",
+        "zenodo_url": "https://zenodo.org/records/20272906",
+        "deposition_id": 20272906,
+        "record_id": 20272906,
+        "date": "2026-03-10",
+        "notes": "Initial submission"
+      }
+    }
+  },
+  "2026-005": {
+    "conceptrecid": "20272909",
+    "current_revision": 2,
+    "current_doi": "10.5281/zenodo.20272910",
+    "current_doi_url": "https://doi.org/10.5281/zenodo.20272910",
+    "current_zenodo_url": "https://zenodo.org/records/20272910",
+    "current_deposition_id": 20272910,
+    "revisions": {
+      "2": {
+        "doi": "10.5281/zenodo.20272910",
+        "doi_url": "https://doi.org/10.5281/zenodo.20272910",
+        "zenodo_url": "https://zenodo.org/records/20272910",
+        "deposition_id": 20272910,
+        "record_id": 20272910,
+        "date": "2026-04-15",
+        "notes": "Updated with H100 results"
+      }
+    }
+  }
+}

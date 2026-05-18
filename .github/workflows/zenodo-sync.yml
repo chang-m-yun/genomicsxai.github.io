@@ -93,7 +93,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_CONTENTS_WRITE_TOKEN }}
         run: |
-          if git diff --quiet -- data/zenodo.json; then
+          if [ -z "$(git status --porcelain -- data/zenodo.json)" ]; then
             echo "No Zenodo metadata changes to commit."
             exit 0
           fi
