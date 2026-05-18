@@ -116,8 +116,7 @@ jobs:
             exit 1
           fi
           if [ -z "$GH_DISCUSSIONS_TOKEN" ]; then
-            echo "GH_DISCUSSIONS_TOKEN is required for production discussion sync."
-            exit 1
+            echo "GH_DISCUSSIONS_TOKEN is not configured; discussion sync will be skipped."
           fi
           if [ "${{ steps.changed_blogs.outputs.accepted_count }}" != "0" ]; then
             if [ -z "$ZENODO_API_TOKEN" ]; then
