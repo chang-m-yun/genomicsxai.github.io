@@ -3,14 +3,6 @@
 {{- $blogName := $citationData.blogName -}}
 {{- $fullDate := $citationData.fullDate -}}
 {{- $url := .Permalink | absURL -}}
-{{- $zenodoStore := hugo.Data.zenodo | default dict -}}
-{{- $zenodoEntry := dict -}}
-{{- with .Params.post_id -}}
-  {{- with index $zenodoStore . -}}
-    {{- $zenodoEntry = . -}}
-  {{- end -}}
-{{- end -}}
-{{- $revisionDOIs := $zenodoEntry.revisions | default dict -}}
 
 <div class="citation-box">
   <h3 class="citation-box__title">Cite this post:</h3>
@@ -20,38 +12,7 @@
     <em>{{ $blogName }}</em>,
     {{ $fullDate }}.
     <a href="{{ $url }}">{{ $url }}</a>.
-    {{ with $citationData.doi }} <a href="https://doi.org/{{ . }}">DOI: {{ . }}</a>.{{ end }}
-    {{ with $citationData.zenodoUrl }} <a href="{{ . }}" target="_blank" rel="noopener">Zenodo record</a>.{{ end }}
+    {{ with $citationData.doi }} DOI: {{ . }}.{{ end }}
   </p>
-  {{- $hasRevisionDOI := false -}}
-  {{- range .Params.revision_history -}}
-    {{- $versionKey := printf "%v" .version -}}
-    {{- $revisionData := index $revisionDOIs $versionKey | default dict -}}
-    {{- $revisionDoi := $revisionData.doi | default (.doi | default "") -}}
-    {{- if $revisionDoi -}}{{- $hasRevisionDOI = true -}}{{- end -}}
-  {{- end -}}
-  {{- if $hasRevisionDOI }}
-  <div class="citation-box__versions">
-    <h4 class="citation-box__versions-title">DOI Versions</h4>
-    <ul class="citation-box__versions-list">
-      {{- range .Params.revision_history }}
-        {{- $versionKey := printf "%v" .version -}}
-        {{- $revisionData := index $revisionDOIs $versionKey | default dict -}}
-        {{- $revisionDoi := $revisionData.doi | default (.doi | default "") -}}
-        {{- $revisionZenodoUrl := $revisionData.zenodo_url | default (.zenodo_url | default "") -}}
-        {{- if $revisionDoi }}
-        {{- $doiURL := printf "https://doi.org/%s" $revisionDoi -}}
-        {{- $versionDate := .date | time.AsTime | dateFormat "2 January 2006" -}}
-        <li class="citation-box__versions-item">
-          <span class="citation-box__version-label">v{{ .version }}</span>
-          <a href="{{ $doiURL }}" target="_blank" rel="noopener">DOI</a>
-          {{- with $revisionZenodoUrl }} · <a href="{{ . }}" target="_blank" rel="noopener">Zenodo</a>{{ end -}}
-          <span class="citation-box__version-meta">({{ $versionDate }})</span>
-        </li>
-        {{- end }}
-      {{- end }}
-    </ul>
-  </div>
-  {{- end }}
 </div>
 <script src="{{ "js/citation.js" | relURL }}" defer></script>
