@@ -43,6 +43,11 @@
   function show(el) { el.style.display = ''; el.removeAttribute('hidden'); }
   function hide(el) { el.style.display = 'none'; el.setAttribute('hidden', ''); }
   function today() { return new Date().toISOString().slice(0, 10); }
+  // Inverse of the existing btoa(unescape(encodeURIComponent(...))) used in onSubmit.
+  function decodeBase64Utf8(b64) {
+    var clean = (b64 || '').replace(/\s/g, '');
+    return decodeURIComponent(escape(atob(clean)));
+  }
 
   // ── Auth (GitHub Device Flow) ──
   // Device Flow lets a public client authenticate without a Client Secret.
@@ -194,6 +199,12 @@
       return this.request('GET', '/repos/' + CONFIG.OWNER + '/' + CONFIG.REPO + '/pulls?state=open&per_page=100');
     },
 
+    // Wraps GitHub Search API for the "find merged PRs by author" fallback used
+    // when a legacy post doesn't carry submitter_github in frontmatter yet.
+    searchIssues: function (q) {
+      return this.request('GET', '/search/issues?q=' + encodeURIComponent(q) + '&per_page=100');
+    },
+
     forkRepo: function () {
       return this.request('POST', '/repos/' + CONFIG.OWNER + '/' + CONFIG.REPO + '/forks', {});
     },
@@ -263,6 +274,160 @@
       var max = existing.length ? Math.max.apply(null, existing) : 0;
       var next = (max + 1).toString().padStart(3, '0');
       return year + '-' + next;
+    },
+  };
+
+  // ── UpdateMode ──
+  // Powers the "Update an existing post" flow. Keeps state about which post is
+  // being revised, whether to pre-fill from the published version or start
+  // blank, and which existing images the author wants to keep.
+  var UpdateMode = {
+    active: false,
+    startMode: 'prefill',          // 'prefill' or 'blank'
+    postId: null,
+    notes: '',
+    existingFrontmatter: null,
+    existingBody: '',
+    existingFiles: [],             // [{ name, sha, isImage }]
+    removedExistingImages: {},     // { filename: true } for existing images the user toggled off
+    myPosts: [],                   // [{ post_id, title, source }] for the dropdown
+
+    IMAGE_EXTS: ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'],
+
+    isImageName: function (name) {
+      var lower = (name || '').toLowerCase();
+      return UpdateMode.IMAGE_EXTS.some(function (ext) { return lower.endsWith(ext); });
+    },
+
+    reset: function () {
+      this.active = false;
+      this.startMode = 'prefill';
+      this.postId = null;
+      this.notes = '';
+      this.existingFrontmatter = null;
+      this.existingBody = '';
+      this.existingFiles = [];
+      this.removedExistingImages = {};
+    },
+
+    // Find every blog post attributable to the given GitHub login.
+    // Primary: read each post's frontmatter and match submitter_github.
+    // Fallback for legacy posts (pre-feature): GitHub search for merged PRs by
+    // this user with the "Blog post YYYY-NNN: …" title pattern; confirm each
+    // candidate by re-fetching its index.md.
+    listMyPosts: async function (login) {
+      var results = [];
+      var seen = {};
+
+      var dirItems = [];
+      try {
+        dirItems = await GitHubAPI.getContents(CONFIG.OWNER, CONFIG.REPO, CONFIG.BLOGS_PATH);
+      } catch (e) { dirItems = []; }
+
+      var dirs = (dirItems || []).filter(function (it) {
+        return it && it.type === 'dir' && /^\d{4}-\d{3}$/.test(it.name);
+      });
+
+      await Promise.all(dirs.map(async function (dir) {
+        try {
+          var f = await GitHubAPI.getContents(CONFIG.OWNER, CONFIG.REPO, CONFIG.BLOGS_PATH + '/' + dir.name + '/index.md');
+          var parsed = FileParser.parse(decodeBase64Utf8(f.content));
+          if (!parsed) return;
+          var fm = parsed.frontmatter || {};
+          if (fm.submitter_github !== login) return;
+          if (fm.status && fm.status !== 'published') return;
+          results.push({ post_id: dir.name, title: fm.title || '(untitled)', source: 'frontmatter' });
+          seen[dir.name] = true;
+        } catch (e) { /* ignore individual post failures */ }
+      }));
+
+      try {
+        var q = 'repo:' + CONFIG.OWNER + '/' + CONFIG.REPO + ' type:pr is:merged author:' + login + ' in:title "Blog post"';
+        var search = await GitHubAPI.searchIssues(q);
+        var candidates = {};
+        ((search && search.items) || []).forEach(function (pr) {
+          var m = (pr.title || '').match(/^Blog post (\d{4}-\d{3}):/i);
+          if (!m) return;
+          var id = m[1];
+          if (seen[id]) return;
+          candidates[id] = true;
+        });
+        await Promise.all(Object.keys(candidates).map(async function (id) {
+          try {
+            var f = await GitHubAPI.getContents(CONFIG.OWNER, CONFIG.REPO, CONFIG.BLOGS_PATH + '/' + id + '/index.md');
+            var parsed = FileParser.parse(decodeBase64Utf8(f.content));
+            if (!parsed) return;
+            var fm = parsed.frontmatter || {};
+            if (fm.status && fm.status !== 'published') return;
+            results.push({ post_id: id, title: fm.title || '(untitled)', source: 'pr-search' });
+            seen[id] = true;
+          } catch (e) { /* ignore */ }
+        }));
+      } catch (e) { /* PR-search fallback is best-effort */ }
+
+      results.sort(function (a, b) { return a.post_id < b.post_id ? 1 : -1; });
+      this.myPosts = results;
+      return results;
+    },
+
+    // Fetch index.md + the post directory listing so we know the file SHAs to
+    // keep, replace, or delete in the update commit.
+    loadPost: async function (postId) {
+      var dir = CONFIG.BLOGS_PATH + '/' + postId;
+      var listing = await GitHubAPI.getContents(CONFIG.OWNER, CONFIG.REPO, dir);
+      var hasIndex = (listing || []).some(function (it) { return it.type === 'file' && it.name === 'index.md'; });
+      if (!hasIndex) throw new Error('Could not find index.md in ' + dir);
+
+      var indexResp = await GitHubAPI.getContents(CONFIG.OWNER, CONFIG.REPO, dir + '/index.md');
+      var parsed = FileParser.parse(decodeBase64Utf8(indexResp.content));
+      if (!parsed) throw new Error('Could not parse frontmatter of ' + dir + '/index.md');
+
+      this.postId = postId;
+      this.existingFrontmatter = parsed.frontmatter || {};
+      this.existingBody = parsed.body || '';
+      this.existingFiles = (listing || [])
+        .filter(function (it) { return it.type === 'file' && it.name !== 'index.md'; })
+        .map(function (it) { return { name: it.name, sha: it.sha, isImage: UpdateMode.isImageName(it.name) }; });
+      this.removedExistingImages = {};
+      return parsed;
+    },
+
+    // Build the part of the git tree that handles the post's *non-index.md*
+    // files: keep, delete, or replace. Image blobs the user newly uploaded are
+    // handled separately by the existing ImageHandler/createBlob path.
+    buildExistingFileTreeItems: function (newImageFilenames) {
+      var blogDir = CONFIG.BLOGS_PATH + '/' + this.postId;
+      var items = [];
+      var newNamesLower = {};
+      (newImageFilenames || []).forEach(function (n) { newNamesLower[n.toLowerCase()] = true; });
+
+      this.existingFiles.forEach(function (f) {
+        var path = blogDir + '/' + f.name;
+        var overwrittenByUpload = newNamesLower[f.name.toLowerCase()];
+        var removed = !!UpdateMode.removedExistingImages[f.name];
+
+        if (UpdateMode.startMode === 'blank') {
+          // Blank mode: delete every existing non-index file unless the user
+          // re-uploaded one with the same name (the new blob will replace it).
+          if (!overwrittenByUpload) {
+            items.push({ path: path, mode: '100644', type: 'blob', sha: null });
+          }
+          return;
+        }
+
+        // Pre-fill mode
+        if (removed && !overwrittenByUpload) {
+          items.push({ path: path, mode: '100644', type: 'blob', sha: null });
+        } else if (!overwrittenByUpload) {
+          // Keep the file by referencing its existing SHA
+          items.push({ path: path, mode: '100644', type: 'blob', sha: f.sha });
+        }
+        // If overwrittenByUpload: skip — the upload path adds its own tree
+        // entry with the new blob SHA and that wins because it appears later
+        // in the tree array.
+      });
+
+      return items;
     },
   };
 
@@ -543,6 +708,9 @@
       lines.push('');
 
       lines.push('editor: "' + (fm.editor || 'TBD') + '"');
+      if (fm.submitter_github) {
+        lines.push('submitter_github: "' + fm.submitter_github + '"');
+      }
       lines.push('');
       lines.push('tags: ' + JSON.stringify(fm.tags || []));
       lines.push('categories: ' + JSON.stringify(fm.categories || ['Blog Post']));
@@ -551,18 +719,28 @@
       lines.push('audience: ' + JSON.stringify(fm.audience || []));
       lines.push('labs: ' + JSON.stringify(fm.labs || []));
       lines.push('');
-      lines.push('status: "submitted"');
-      lines.push('revision: 1');
+      var status = fm.status || 'submitted';
+      lines.push('status: "' + status + '"');
+      var revision = parseInt(fm.revision, 10);
+      if (!revision || isNaN(revision)) revision = 1;
+      lines.push('revision: ' + revision);
       lines.push('');
       lines.push('date_submitted: ' + (fm.date_submitted || today()));
-      lines.push('date_accepted:');
+      lines.push('date_accepted:' + (fm.date_accepted ? ' ' + fm.date_accepted : ''));
       lines.push('date: ' + (fm.date || fm.date_submitted || today()));
       lines.push('');
       lines.push('doi: "' + (fm.doi || '') + '"');
+
+      // revision_history: emit the merged history if present, else seed a single entry
+      var history = Array.isArray(fm.revision_history) && fm.revision_history.length
+        ? fm.revision_history
+        : [{ version: 1, date: fm.date_submitted || today(), notes: 'Initial submission' }];
       lines.push('revision_history:');
-      lines.push('  - version: 1');
-      lines.push('    date: ' + (fm.date_submitted || today()));
-      lines.push('    notes: "Initial submission"');
+      history.forEach(function (h) {
+        lines.push('  - version: ' + (h.version || 1));
+        lines.push('    date: ' + (h.date || today()));
+        lines.push('    notes: "' + String(h.notes || '').replace(/"/g, '\\"') + '"');
+      });
 
       lines.push('---');
       lines.push('');
@@ -674,6 +852,233 @@
         el.addEventListener('input', function () { self.revalidate(); });
         el.addEventListener('change', function () { self.revalidate(); });
       });
+
+      // Mode chooser (new vs update)
+      var modeRadios = $$('input[name="sf-mode"]');
+      modeRadios.forEach(function (r) {
+        r.addEventListener('change', function () { self.onModeChange(); });
+      });
+      var startRadios = $$('input[name="sf-update-start"]');
+      startRadios.forEach(function (r) {
+        r.addEventListener('change', function () { self.refreshModeContinueState(); });
+      });
+      var notesEl = $('#sf-update-notes');
+      if (notesEl) {
+        notesEl.addEventListener('input', function () { self.refreshModeContinueState(); });
+      }
+      var postPicker = $('#sf-update-post');
+      if (postPicker) {
+        postPicker.addEventListener('change', function () { self.refreshModeContinueState(); });
+      }
+      var continueBtn = $('#submit-form__mode-continue');
+      if (continueBtn) {
+        continueBtn.addEventListener('click', function () { self.onModeContinue(); });
+      }
+    },
+
+    showModeError: function (msg) {
+      var el = $('#submit-form__mode-error');
+      if (!el) return;
+      el.textContent = msg || '';
+      if (msg) show(el); else hide(el);
+    },
+
+    onModeChange: function () {
+      var update = ($('#sf-mode-update') || {}).checked;
+      var options = $('#submit-form__update-options');
+      if (options) {
+        if (update) show(options); else hide(options);
+      }
+      this.showModeError('');
+      this.refreshModeContinueState();
+    },
+
+    refreshModeContinueState: function () {
+      var btn = $('#submit-form__mode-continue');
+      if (!btn) return;
+      var isUpdate = ($('#sf-mode-update') || {}).checked;
+      if (!isUpdate) {
+        btn.disabled = false;
+        return;
+      }
+      var postSel = $('#sf-update-post');
+      var picked = postSel && postSel.value;
+      var notes = (($('#sf-update-notes') || {}).value || '').trim();
+      btn.disabled = !(picked && notes);
+    },
+
+    populatePostPicker: async function () {
+      var sel = $('#sf-update-post');
+      var help = $('#sf-update-post-help');
+      if (!sel) return;
+      sel.innerHTML = '<option value="">Loading your posts…</option>';
+      sel.disabled = true;
+      try {
+        var posts = await UpdateMode.listMyPosts(this.user.login);
+        if (!posts.length) {
+          sel.innerHTML = '<option value="">No posts found for @' + this.user.login + '</option>';
+          if (help) help.textContent = "We couldn't find any published posts attributed to your GitHub account. If this looks wrong, contact an editor.";
+          sel.disabled = true;
+          // Disable the update option entirely
+          var updateRadio = $('#sf-mode-update');
+          if (updateRadio) updateRadio.disabled = true;
+          return;
+        }
+        sel.innerHTML = '<option value="">— Choose a post —</option>' +
+          posts.map(function (p) {
+            return '<option value="' + p.post_id + '">' + p.post_id + ' — ' + p.title.replace(/</g, '&lt;') + '</option>';
+          }).join('');
+        sel.disabled = false;
+        if (help) help.textContent = 'Only posts you originally submitted appear here.';
+      } catch (e) {
+        sel.innerHTML = '<option value="">Could not load posts</option>';
+        if (help) help.textContent = 'Error loading your posts: ' + e.message;
+        sel.disabled = true;
+      }
+    },
+
+    onModeContinue: async function () {
+      var isUpdate = ($('#sf-mode-update') || {}).checked;
+      var continueBtn = $('#submit-form__mode-continue');
+      this.showModeError('');
+
+      if (!isUpdate) {
+        UpdateMode.reset();
+        this.revealPostModeBody();
+        return;
+      }
+
+      var postId = ($('#sf-update-post') || {}).value;
+      var startMode = ($('#sf-update-start-blank') || {}).checked ? 'blank' : 'prefill';
+      var notes = (($('#sf-update-notes') || {}).value || '').trim();
+      if (!postId || !notes) {
+        this.showModeError('Pick a post and add a one-line revision note.');
+        return;
+      }
+
+      if (continueBtn) { continueBtn.disabled = true; continueBtn.textContent = 'Loading…'; }
+      try {
+        await UpdateMode.loadPost(postId);
+        UpdateMode.active = true;
+        UpdateMode.startMode = startMode;
+        UpdateMode.notes = notes;
+        this.revealPostModeBody();
+
+        if (startMode === 'prefill') {
+          // Re-use the existing populate path so all field bindings run identically
+          // to the file-upload flow.
+          this.parsed = {
+            frontmatter: UpdateMode.existingFrontmatter,
+            body: UpdateMode.existingBody,
+            rawYaml: '',
+          };
+          this.populateFields(UpdateMode.existingFrontmatter || {});
+          var bodyInput = $('#submit-form__body-input');
+          if (bodyInput) bodyInput.value = UpdateMode.existingBody || '';
+          this.renderExistingImages();
+          show($('#submit-form__fields'));
+          show($('#submit-form__body-section'));
+          show($('#submit-form__actions'));
+        } else {
+          // Blank: keep post_id from UpdateMode, but show the form empty so the
+          // author can upload an entirely new index.md or write from scratch.
+          this.parsed = { frontmatter: {}, body: '', rawYaml: '' };
+        }
+        this.revalidate();
+      } catch (e) {
+        this.showModeError('Could not load post: ' + e.message);
+      } finally {
+        if (continueBtn) { continueBtn.disabled = false; continueBtn.textContent = 'Continue'; }
+      }
+    },
+
+    revealPostModeBody: function () {
+      var body = $('#submit-form__post-mode-body');
+      if (body) show(body);
+      this.renderUpdateBanner();
+    },
+
+    renderUpdateBanner: function () {
+      var el = $('#submit-form__update-banner');
+      if (!el) return;
+      if (!UpdateMode.active) { hide(el); el.innerHTML = ''; return; }
+      var fm = UpdateMode.existingFrontmatter || {};
+      var nextRev = (parseInt(fm.revision, 10) || 1) + 1;
+      el.innerHTML =
+        '<strong>Updating ' + UpdateMode.postId + '</strong> — "' +
+        (fm.title || '(untitled)').replace(/</g, '&lt;') + '" (revision ' + nextRev + ').' +
+        ' This PR will modify <code>content/blogs/' + UpdateMode.postId + '/index.md</code>.';
+      show(el);
+    },
+
+    renderExistingImages: function () {
+      var wrap = $('#submit-form__existing-images-wrap');
+      var container = $('#submit-form__existing-images');
+      if (!wrap || !container) return;
+      var imgFiles = UpdateMode.existingFiles.filter(function (f) { return f.isImage; });
+      if (!UpdateMode.active || UpdateMode.startMode !== 'prefill' || imgFiles.length === 0) {
+        hide(wrap);
+        container.innerHTML = '';
+        return;
+      }
+      container.innerHTML = '';
+      imgFiles.forEach(function (f) {
+        var thumb = document.createElement('div');
+        var removed = !!UpdateMode.removedExistingImages[f.name];
+        thumb.className = 'submit-form__image-thumb submit-form__image-thumb--existing' +
+          (removed ? ' submit-form__image-thumb--removed' : '');
+
+        var img = document.createElement('img');
+        img.src = 'https://raw.githubusercontent.com/' + CONFIG.OWNER + '/' + CONFIG.REPO +
+          '/' + CONFIG.DEFAULT_BRANCH + '/' + CONFIG.BLOGS_PATH + '/' + UpdateMode.postId + '/' + encodeURIComponent(f.name);
+        img.alt = f.name;
+
+        var span = document.createElement('span');
+        span.className = 'submit-form__image-name';
+        span.textContent = f.name;
+
+        var insertBtn = document.createElement('button');
+        insertBtn.type = 'button';
+        insertBtn.className = 'submit-form__image-insert';
+        insertBtn.dataset.filename = f.name.toLowerCase();
+        insertBtn.title = 'Insert at cursor in body';
+        insertBtn.textContent = 'Insert';
+        insertBtn.addEventListener('click', function () {
+          var ta = $('#submit-form__body-input');
+          if (!ta) return;
+          var placeholder = '[image: ' + f.name.toLowerCase() + ']';
+          var start = ta.selectionStart || 0;
+          var end = ta.selectionEnd || 0;
+          var before = ta.value.slice(0, start);
+          var after = ta.value.slice(end);
+          var prefix = (before.length === 0 || before.endsWith('\n')) ? '' : '\n';
+          ta.value = before + prefix + placeholder + '\n' + after;
+          var newPos = before.length + prefix.length + placeholder.length + 1;
+          ta.focus();
+          ta.setSelectionRange(newPos, newPos);
+          FormController.revalidate();
+        });
+
+        var keepBtn = document.createElement('button');
+        keepBtn.type = 'button';
+        keepBtn.className = 'submit-form__image-keep';
+        keepBtn.textContent = removed ? 'Removed — click to keep' : 'Keep — click to remove';
+        keepBtn.addEventListener('click', function () {
+          if (UpdateMode.removedExistingImages[f.name]) {
+            delete UpdateMode.removedExistingImages[f.name];
+          } else {
+            UpdateMode.removedExistingImages[f.name] = true;
+          }
+          FormController.renderExistingImages();
+        });
+
+        thumb.appendChild(img);
+        thumb.appendChild(span);
+        thumb.appendChild(insertBtn);
+        thumb.appendChild(keepBtn);
+        container.appendChild(thumb);
+      });
+      show(wrap);
     },
 
     renderAuthState: function () {
@@ -688,11 +1093,25 @@
         show(userSection);
         $('#submit-form__username').textContent = '@' + this.user.login;
         show(formBody);
+        // Kick off populating the "update an existing post" dropdown. Best-effort:
+        // the new-post path doesn't depend on this completing.
+        this.populatePostPicker();
+        this.refreshModeContinueState();
       } else {
         show(loginSection);
         if (pendingSection) hide(pendingSection);
         hide(userSection);
         hide(formBody);
+        // Reset post-mode UI so re-login starts clean
+        var postBody = $('#submit-form__post-mode-body');
+        if (postBody) hide(postBody);
+        var modeNew = $('#sf-mode-new');
+        if (modeNew) modeNew.checked = true;
+        var modeUpdate = $('#sf-mode-update');
+        if (modeUpdate) { modeUpdate.checked = false; modeUpdate.disabled = false; }
+        var updateOpts = $('#submit-form__update-options');
+        if (updateOpts) hide(updateOpts);
+        UpdateMode.reset();
       }
     },
 
@@ -898,7 +1317,14 @@
     },
 
     readFieldsToFrontmatter: function () {
-      var fm = Object.assign({}, this.parsed ? this.parsed.frontmatter : {});
+      // Start from whatever frontmatter the user loaded (upload, prefill, or blank).
+      // In update mode, layer the existing post's frontmatter underneath so that
+      // fields the user can't edit via the form (post_id, date_submitted, etc.)
+      // survive even in "start blank" mode.
+      var base = (UpdateMode.active && UpdateMode.existingFrontmatter)
+        ? Object.assign({}, UpdateMode.existingFrontmatter, this.parsed ? this.parsed.frontmatter : {})
+        : Object.assign({}, this.parsed ? this.parsed.frontmatter : {});
+      var fm = base;
 
       fm.title = ($('#sf-title') || {}).value || '';
 
@@ -951,7 +1377,28 @@
       fm.editor = fm.editor || 'TBD';
       fm.categories = fm.categories || ['Blog Post'];
       fm.status = 'submitted';
-      fm.revision = fm.revision || 1;
+
+      if (UpdateMode.active) {
+        var existing = UpdateMode.existingFrontmatter || {};
+        fm.post_id = UpdateMode.postId;
+        // Preserve the original submitter — never overwrite. Backfill on legacy
+        // posts that don't carry the field yet (the PR-search fallback already
+        // proved this user authored the original PR).
+        fm.submitter_github = existing.submitter_github || (this.user && this.user.login) || fm.submitter_github;
+        fm.date_submitted = existing.date_submitted || fm.date_submitted || today();
+        var prevRev = parseInt(existing.revision, 10);
+        if (!prevRev || isNaN(prevRev)) prevRev = 1;
+        fm.revision = prevRev + 1;
+        var history = Array.isArray(existing.revision_history) ? existing.revision_history.slice() : [];
+        if (history.length === 0) {
+          history.push({ version: 1, date: existing.date_submitted || today(), notes: 'Initial submission' });
+        }
+        history.push({ version: fm.revision, date: today(), notes: UpdateMode.notes || 'Update' });
+        fm.revision_history = history;
+      } else {
+        fm.revision = fm.revision || 1;
+        if (this.user && this.user.login) fm.submitter_github = this.user.login;
+      }
 
       return fm;
     },
@@ -1005,15 +1452,25 @@
       var state = {};
 
       try {
-        // Determine post ID
-        this.postId = await PostID.getNext();
+        // Determine post ID (existing post in update mode, otherwise allocate fresh)
+        if (UpdateMode.active) {
+          this.postId = UpdateMode.postId;
+        } else {
+          this.postId = await PostID.getNext();
+        }
         fm.post_id = this.postId;
 
-        // Featured image: if user uploaded images and frontmatter has image, check if it matches
+        // Featured image: if user uploaded images and frontmatter has image, check if it matches.
+        // In update mode, an existing image of that name kept from the published version also counts.
         if (fm.image && ImageHandler.files.length) {
           var found = ImageHandler.files.some(function (f) {
             return ImageHandler.sanitizeName(f.name) === fm.image || f.name === fm.image;
           });
+          if (!found && UpdateMode.active) {
+            found = UpdateMode.existingFiles.some(function (f) {
+              return !UpdateMode.removedExistingImages[f.name] && f.name === fm.image;
+            });
+          }
           if (!found) fm.image = '';
         }
 
@@ -1021,7 +1478,9 @@
         var rawBody = bodyInput ? (bodyInput.value || '') : (this.parsed ? this.parsed.body : '');
         var body = MarkdownGen.expandImageKeywords(rawBody);
         var mdContent = MarkdownGen.generate(fm, body);
-        var branchName = 'blog/' + this.postId;
+        var branchName = UpdateMode.active
+          ? 'update/' + this.postId + '-rev-' + fm.revision
+          : 'blog/' + this.postId;
 
         // Step 1: Fork
         Progress.setStep(0);
@@ -1067,6 +1526,17 @@
         });
         var imageItems = await Promise.all(imagePromises);
         treeItems = treeItems.concat(imageItems);
+
+        // Update mode: keep existing images by SHA reference, delete any the
+        // user toggled off (or in "blank" mode, delete every non-uploaded file).
+        if (UpdateMode.active) {
+          var newNames = ImageHandler.files.map(function (f) { return ImageHandler.sanitizeName(f.name); });
+          var existingItems = UpdateMode.buildExistingFileTreeItems(newNames);
+          // Existing items first; uploaded items already in treeItems will win
+          // on conflict because they appear later in the tree array sent to
+          // GitHub's /git/trees endpoint.
+          treeItems = existingItems.concat(treeItems);
+        }
         Progress.complete(2);
 
         // Step 4: Create tree and commit
@@ -1074,9 +1544,12 @@
         // Get the base tree SHA
         var baseCommit = await GitHubAPI.request('GET', '/repos/' + state.forkOwner + '/' + CONFIG.REPO + '/git/commits/' + state.baseSha);
         var tree = await GitHubAPI.createTree(state.forkOwner, baseCommit.tree.sha, treeItems);
+        var commitMsg = UpdateMode.active
+          ? 'Update blog post ' + this.postId + ' (rev ' + fm.revision + '): ' + fm.title
+          : 'Add blog post ' + this.postId + ': ' + fm.title;
         var commit = await GitHubAPI.createCommit(
           state.forkOwner,
-          'Add blog post ' + this.postId + ': ' + fm.title,
+          commitMsg,
           tree.sha,
           [state.baseSha]
         );
@@ -1085,19 +1558,39 @@
 
         // Step 5: Create PR
         Progress.setStep(4);
-        var prBody =
-          '# Blog Post Submission\n\n' +
-          '- [x] Post uses the [blog post template](https://github.com/genomicsxai/genomicsxai.github.io/blob/main/docs/blog-post-template.md) and required frontmatter is complete\n' +
-          '- [ ] Content follows [submission guidelines](https://genomicsxai.github.io/submission-guidelines/)\n' +
-          '- [ ] Lab review completed\n' +
-          '- [ ] Links and assets validated\n\n' +
-          '## Notes for Editors\n' +
-          'Submitted via the web form by @' + this.user.login + '.\n' +
-          'Post ID: ' + this.postId + '\n';
+        var prTitle, prBody;
+        if (UpdateMode.active) {
+          var origSubmitter = (UpdateMode.existingFrontmatter && UpdateMode.existingFrontmatter.submitter_github) || this.user.login;
+          var prevRev = (parseInt(UpdateMode.existingFrontmatter && UpdateMode.existingFrontmatter.revision, 10) || 1);
+          prTitle = 'Update ' + this.postId + ' rev ' + fm.revision + ': ' + fm.title;
+          prBody =
+            '# Blog Post Update (rev ' + fm.revision + ')\n\n' +
+            '- [x] Updates an existing post: [`' + this.postId + '`](https://github.com/' + CONFIG.OWNER + '/' + CONFIG.REPO + '/blob/' + CONFIG.DEFAULT_BRANCH + '/' + CONFIG.BLOGS_PATH + '/' + this.postId + '/index.md)\n' +
+            '- [ ] Content follows [submission guidelines](https://genomicsxai.github.io/submission-guidelines/)\n' +
+            '- [ ] Lab review completed\n' +
+            '- [ ] Links and assets validated\n\n' +
+            '## Revision notes\n' +
+            (UpdateMode.notes || '(none provided)') + '\n\n' +
+            '## Notes for Editors\n' +
+            'Submitted via the web form by @' + this.user.login + '.\n' +
+            'Original submitter: @' + origSubmitter + '.\n' +
+            'Post ID: ' + this.postId + ' (rev ' + prevRev + ' → ' + fm.revision + ').\n';
+        } else {
+          prTitle = 'Blog post ' + this.postId + ': ' + fm.title;
+          prBody =
+            '# Blog Post Submission\n\n' +
+            '- [x] Post uses the [blog post template](https://github.com/genomicsxai/genomicsxai.github.io/blob/main/docs/blog-post-template.md) and required frontmatter is complete\n' +
+            '- [ ] Content follows [submission guidelines](https://genomicsxai.github.io/submission-guidelines/)\n' +
+            '- [ ] Lab review completed\n' +
+            '- [ ] Links and assets validated\n\n' +
+            '## Notes for Editors\n' +
+            'Submitted via the web form by @' + this.user.login + '.\n' +
+            'Post ID: ' + this.postId + '\n';
+        }
 
         var pr = await GitHubAPI.createPR(
           state.forkOwner + ':' + branchName,
-          'Blog post ' + this.postId + ': ' + fm.title,
+          prTitle,
           prBody
         );
         Progress.complete(4);

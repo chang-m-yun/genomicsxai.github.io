@@ -21,6 +21,11 @@ authors_display:
 
 editor: "Editor Name"
 
+# Set automatically by the submission form to the GitHub login of the original
+# submitter. Used by the form to surface "Update one of my previous posts" for
+# the same account on later revisions. Safe to omit when authoring manually.
+# submitter_github: "your-github-login"
+
 # Add any number of tags. They're searchable on the blog homepage. See https://genomicsxai.github.io/tags/ for examples.
 tags: ["genomics", "causal-inference"]
 # Category determines which homepage pill filter the post appears under.

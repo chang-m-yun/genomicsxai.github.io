@@ -1541,6 +1541,99 @@ article img {
   }
 }
 
+/* Mode chooser (new submission vs update) */
+.submit-form__mode-chooser {
+  padding: 1.5rem 1.75rem;
+  background: #f7fbff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+[data-scheme="dark"] .submit-form__mode-chooser {
+  background: #2d3138;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.submit-form__radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0.5rem 0 1rem 0;
+}
+.submit-form__radio {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+.submit-form__radio input[type="radio"] {
+  margin: 0;
+}
+.submit-form__update-options {
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--card-separator-color, rgba(218, 218, 218, 0.4));
+}
+.submit-form__mode-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Update banner shown atop the post-mode body when in update mode */
+.submit-form__update-banner {
+  padding: 0.9rem 1.1rem;
+  background: rgba(52, 73, 94, 0.06);
+  border: 1px solid var(--card-separator-color, rgba(218, 218, 218, 0.5));
+  border-radius: 8px;
+  font-size: 1.35rem;
+  color: var(--card-text-color-secondary, #555);
+  margin-bottom: 1rem;
+}
+[data-scheme="dark"] .submit-form__update-banner {
+  background: rgba(255, 255, 255, 0.06);
+}
+.submit-form__update-banner strong {
+  color: var(--card-text-color-main, #333);
+}
+
+/* Existing images carried over from a published post */
+.submit-form__existing-images {
+  margin-bottom: 1rem;
+}
+.submit-form__subsubsection-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.25rem 0;
+  color: var(--card-text-color-secondary, #555);
+}
+.submit-form__image-thumb--existing {
+  outline: 2px solid rgba(52, 73, 94, 0.15);
+}
+.submit-form__image-thumb--removed {
+  opacity: 0.35;
+}
+.submit-form__image-thumb--removed img {
+  filter: grayscale(1);
+}
+.submit-form__image-keep {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 4px 0;
+  background: transparent;
+  color: var(--card-text-color-main, #333);
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.submit-form__image-keep:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
 /* PhotoSwipe lightbox: caption as a banner below the image */
 .pswp__custom-caption {
   position: absolute;

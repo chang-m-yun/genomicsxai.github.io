@@ -45,6 +45,62 @@
   <!-- Form body (hidden until authenticated) -->
   <div id="submit-form__body" hidden>
 
+    <!-- Mode chooser: new submission vs update an existing post -->
+    <div id="submit-form__mode-chooser" class="submit-form__section submit-form__mode-chooser">
+      <h3 class="submit-form__section-title">What are you submitting?</h3>
+      <div class="submit-form__radio-group">
+        <label class="submit-form__radio">
+          <input type="radio" name="sf-mode" value="new" id="sf-mode-new" checked>
+          <span>Submit a new post</span>
+        </label>
+        <label class="submit-form__radio">
+          <input type="radio" name="sf-mode" value="update" id="sf-mode-update">
+          <span>Update one of my previous posts</span>
+        </label>
+      </div>
+
+      <div id="submit-form__update-options" class="submit-form__update-options" hidden>
+        <div class="submit-form__field">
+          <label class="submit-form__label submit-form__label--required" for="sf-update-post">Which post?</label>
+          <select id="sf-update-post" class="submit-form__input">
+            <option value="">Loading your posts…</option>
+          </select>
+          <span class="submit-form__help" id="sf-update-post-help">Only posts you originally submitted appear here.</span>
+        </div>
+
+        <div class="submit-form__field">
+          <label class="submit-form__label submit-form__label--required">Start from</label>
+          <div class="submit-form__radio-group">
+            <label class="submit-form__radio">
+              <input type="radio" name="sf-update-start" value="prefill" id="sf-update-start-prefill" checked>
+              <span>Pre-fill from the published version (recommended)</span>
+            </label>
+            <label class="submit-form__radio">
+              <input type="radio" name="sf-update-start" value="blank" id="sf-update-start-blank">
+              <span>Start blank — I'll upload or re-write from scratch</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="submit-form__field">
+          <label class="submit-form__label submit-form__label--required" for="sf-update-notes">Revision notes</label>
+          <input type="text" id="sf-update-notes" class="submit-form__input" placeholder="One line describing this revision (e.g. 'Fix typos in methods section')">
+          <span class="submit-form__help">Recorded in <code>revision_history</code>.</span>
+        </div>
+      </div>
+
+      <div class="submit-form__mode-actions">
+        <button type="button" id="submit-form__mode-continue" class="submit-form__btn submit-form__btn--primary" disabled>Continue</button>
+      </div>
+      <div id="submit-form__mode-error" class="submit-form__field-error" hidden></div>
+    </div>
+
+    <!-- The rest of the form is revealed only after Continue. -->
+    <div id="submit-form__post-mode-body" hidden>
+
+    <!-- Banner for update mode -->
+    <div id="submit-form__update-banner" class="submit-form__update-banner" hidden></div>
+
     <!-- Upload index.md -->
     <div class="submit-form__section">
       <h3 class="submit-form__section-title">Upload your index.md</h3>
@@ -155,6 +211,14 @@
       <div id="submit-form__images-subsection" class="submit-form__body-images">
         <h4 class="submit-form__subsection-title">Images</h4>
         <p class="submit-form__help">Upload images you want to embed. Max 10 MB per file, 50 MB total. Use the <strong>Insert</strong> button on each thumbnail to drop a placeholder into the text above.</p>
+
+        <!-- Existing images carried over from the published post (update mode only) -->
+        <div id="submit-form__existing-images-wrap" class="submit-form__existing-images" hidden>
+          <h5 class="submit-form__subsubsection-title">Existing images (from published version)</h5>
+          <p class="submit-form__help">These ship with the current post. Untick any you want to remove from the updated version.</p>
+          <div id="submit-form__existing-images" class="submit-form__image-previews"></div>
+        </div>
+
         <div id="submit-form__img-drop-zone" class="submit-form__drop-zone">
           <p>Drag &amp; drop images here, or click to browse</p>
           <input type="file" id="submit-form__img-input" accept="image/*" multiple hidden>
@@ -173,11 +237,14 @@
     <!-- Progress -->
     <div id="submit-form__progress" class="submit-form__section" hidden></div>
 
-    <!-- Error / Success -->
-    <div id="submit-form__error" class="submit-form__message submit-form__message--error" hidden></div>
-    <div id="submit-form__form-error" class="submit-form__message submit-form__message--error" hidden></div>
-    <div id="submit-form__success" class="submit-form__message submit-form__message--success" hidden></div>
-  </div>
+    </div><!-- /#submit-form__post-mode-body -->
+  </div><!-- /#submit-form__body -->
+
+  <!-- Error / Success messages live OUTSIDE submit-form__body so they
+       remain visible during auth too (when the body is hidden). -->
+  <div id="submit-form__error" class="submit-form__message submit-form__message--error" hidden></div>
+  <div id="submit-form__form-error" class="submit-form__message submit-form__message--error" hidden></div>
+  <div id="submit-form__success" class="submit-form__message submit-form__message--success" hidden></div>
 
   <script type="application/json" id="submit-form__disciplines-data">
 {{- $slugs := slice -}}

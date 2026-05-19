@@ -31,8 +31,13 @@ You'll need a [GitHub account](https://github.com/signup).
    for clarity, correctness, and fit. They may request changes via PR comments.
 5. **Going live** — Once approved, editors merge the PR and GitHub Actions
    deploys the post.
-6. **Updates** — After merge you can submit further edits, which refresh the
-   updated date.
+6. **Updates** — After your post is merged you can revise it through the same
+   form. Sign in, choose **Update one of my previous posts**, pick the post
+   from the dropdown (only posts you originally submitted appear), and add a
+   one-line revision note. You can either pre-fill the form from the published
+   version and edit, or start blank for a full rewrite. Submitting opens a PR
+   that bumps `revision`, appends to `revision_history`, and re-enters
+   editorial review.
 
 On first use, the form asks you to authorize the **Genomics × AI Submission**
 OAuth app. It requests the `public_repo` scope — enough to fork, branch,
