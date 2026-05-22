@@ -7,7 +7,7 @@ image: "modular_generalists_manuscript.png"
 math: true
 
 # Author(s): list of names (used for /authors/<slug>/)
-authors: ["Alan Murphy", "Peter Koo"]
+authors: ["Alan Murphy", "Peter K. Koo"]
 
 # Optional: full details for citation and JSON-LD
 authors_display:
@@ -17,7 +17,7 @@ authors_display:
   - name: "Alejandra Durán"
     affiliation: "Cold Spring Harbor Labs (CSHL)"
     orcid: "0000-0001-8691-5612"
-  - name: "Peter Koo"
+  - name: "Peter K. Koo"
     affiliation: "Cold Spring Harbor Labs (CSHL)"
     orcid: "0000-0001-8722-0038"
 
