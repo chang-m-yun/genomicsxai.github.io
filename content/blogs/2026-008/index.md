@@ -17,7 +17,8 @@ scope: ["insights"]
 audience: ["general"]
 labs: ["Genomics x AI"]
 
-status: "accepted"
+draft: true
+status: "withdrawn"
 revision: 1
 
 date_submitted: 2026-05-22

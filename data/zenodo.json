@@ -130,5 +130,24 @@
         "notes": "Third workflow validation revision"
       }
     }
+  },
+  "2026-008": {
+    "conceptrecid": "20347357",
+    "current_revision": 1,
+    "current_doi": "10.5281/zenodo.20347358",
+    "current_doi_url": "https://doi.org/10.5281/zenodo.20347358",
+    "current_zenodo_url": "https://zenodo.org/records/20347358",
+    "current_deposition_id": 20347358,
+    "revisions": {
+      "1": {
+        "doi": "10.5281/zenodo.20347358",
+        "doi_url": "https://doi.org/10.5281/zenodo.20347358",
+        "zenodo_url": "https://zenodo.org/records/20347358",
+        "deposition_id": 20347358,
+        "record_id": 20347358,
+        "date": "2026-05-22",
+        "notes": "Initial Zenodo community token validation post"
+      }
+    }
   }
 }
