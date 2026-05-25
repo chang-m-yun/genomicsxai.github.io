@@ -1,0 +1,30 @@
+{{- if and .IsPage (eq .Section "blogs") -}}
+{{- $citation := partial "helper/citation-data.html" . -}}
+{{- $publicationDate := .Params.date_accepted | default .Date -}}
+{{- $description := partialCached "data/description" . .RelPermalink -}}
+<meta name="citation_title" {{ printf "content=%q" $citation.title | safeHTMLAttr }}>
+{{- range $citation.authors }}
+<meta name="citation_author" {{ printf "content=%q" . | safeHTMLAttr }}>
+{{- end }}
+{{- range .Params.authors_display }}
+  {{- with .affiliation }}
+<meta name="citation_author_institution" {{ printf "content=%q" . | safeHTMLAttr }}>
+  {{- end }}
+{{- end }}
+<meta name="citation_publication_date" content="{{ $publicationDate | dateFormat "2006/01/02" }}">
+<meta name="citation_online_date" content="{{ .Date | dateFormat "2006/01/02" }}">
+<meta name="citation_journal_title" {{ printf "content=%q" $citation.blogName | safeHTMLAttr }}>
+<meta name="citation_fulltext_html_url" content="{{ .Permalink }}">
+{{- with $citation.doi }}
+<meta name="citation_doi" {{ printf "content=%q" . | safeHTMLAttr }}>
+{{- end }}
+{{- with .Params.pdf_url | default .Params.pdf }}
+<meta name="citation_pdf_url" content="{{ . | absURL }}">
+{{- end }}
+{{- with .Params.tags }}
+<meta name="citation_keywords" {{ printf "content=%q" (delimit . "; ") | safeHTMLAttr }}>
+{{- end }}
+{{- with $description }}
+<meta name="citation_abstract" {{ printf "content=%q" . | safeHTMLAttr }}>
+{{- end }}
+{{- end -}}

@@ -209,6 +209,16 @@ jobs:
                --environment preview \
                --baseURL "${{ steps.preview.outputs.preview_url }}"
 
+      - name: Validate Google Scholar metadata
+        env:
+          SITE_URL: ${{ steps.preview.outputs.preview_url }}
+        run: |
+          args=()
+          if [ "${{ github.event.inputs.zenodo_dry_run }}" != "true" ]; then
+            args+=(--require-accepted-doi)
+          fi
+          ruby .github/scripts/validate-scholar-metadata.rb "${args[@]}"
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
