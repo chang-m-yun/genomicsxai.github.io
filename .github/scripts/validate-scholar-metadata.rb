@@ -47,6 +47,7 @@ errors = []
 Dir.glob(File.join(ROOT, "content", "blogs", "*", "index.md")).sort.each do |path|
   fm = frontmatter(path)
   next if fm["draft"] == true
+  next if fm["status"].to_s == "withdrawn"
 
   post_id = fm.fetch("post_id")
   rel_html = File.join("blogs", post_id, "index.html")

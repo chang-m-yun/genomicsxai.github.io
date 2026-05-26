@@ -1,4 +1,4 @@
-{{- if and .IsPage (eq .Section "blogs") -}}
+{{- if and .IsPage (eq .Section "blogs") (ne .Params.status "withdrawn") -}}
 {{- $citation := partial "helper/citation-data.html" . -}}
 {{- $publicationDate := .Params.date_accepted | default .Date -}}
 {{- $description := partialCached "data/description" . .RelPermalink -}}
