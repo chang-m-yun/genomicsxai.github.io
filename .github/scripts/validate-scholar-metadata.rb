@@ -61,7 +61,6 @@ Dir.glob(File.join(ROOT, "content", "blogs", "*", "index.md")).sort.each do |pat
   html = File.read(html_path)
   expected_url = "#{BASE_URL}/blogs/#{post_id}/"
   expected_doi = zenodo.dig(post_id, "current_doi").to_s
-  expected_doi = fm["doi"].to_s if expected_doi.empty?
 
   title_values = meta_values(html, "citation_title")
   errors << "#{path}: missing citation_title" if title_values.empty?
@@ -82,9 +81,7 @@ Dir.glob(File.join(ROOT, "content", "blogs", "*", "index.md")).sort.each do |pat
   end
 
   if expected_doi.empty?
-    if REQUIRE_ACCEPTED_DOI && fm["status"].to_s == "accepted"
-      errors << "#{path}: accepted post is missing Zenodo/frontmatter DOI"
-    end
+    errors << "#{path}: accepted post is missing Zenodo DOI metadata" if REQUIRE_ACCEPTED_DOI
   elsif !meta_values(html, "citation_doi").include?(expected_doi)
     errors << "#{path}: citation_doi must be #{expected_doi}"
   end
