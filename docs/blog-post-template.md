@@ -29,11 +29,12 @@ editor: "Editor Name"
 # Add any number of tags. They're searchable on the blog homepage. See https://genomicsxai.github.io/tags/ for examples.
 tags: ["genomics", "causal-inference"]
 # Category determines which homepage pill filter the post appears under.
-# Supported values: "Announcement", "Blog Post", "Tutorial", "Perspective"
-#   - "Announcement" → appears under the Announcements pill (editorial/community announcements)
-#   - "Blog Post"    → appears under the Blogs pill (default for most posts)
-#   - "Tutorial"     → appears under the Tutorials pill (step-by-step technical guides)
-#   - "Perspective"  → appears under the Perspectives pill (opinion pieces, commentary)
+# Supported values: "Announcement", "Blog Post", "Tutorial", "Perspective", "Paper Reviews"
+#   - "Announcement"  → appears under the Announcements pill (editorial/community announcements)
+#   - "Blog Post"     → appears under the Blogs pill (default for most posts)
+#   - "Tutorial"      → appears under the Tutorials pill (step-by-step technical guides)
+#   - "Perspective"   → appears under the Perspectives pill (opinion pieces, commentary)
+#   - "Paper Reviews" → appears under the Paper Reviews pill (summaries/critiques of a published paper)
 # Note: the homepage pills filter by `categories` only, not by `scope`.
 categories: ["Blog Post"]
 
