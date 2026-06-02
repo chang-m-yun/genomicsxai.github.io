@@ -130,12 +130,13 @@ Writer of the post. Author pages at `/authors/<slug>/` (affiliation, ORCID, webs
 
 Determines which homepage pill filter a post appears under.
 
-Supported values: **Announcement**, **Blog Post**, **Tutorial**, **Perspective**.
+Supported values: **Announcement**, **Blog Post**, **Tutorial**, **Perspective**, **Paper Reviews**.
 
 - `Announcement` — editorial and community announcements (appears under the **Announcements** pill)
 - `Blog Post` — standard research write-ups (appears under the **Blogs** pill)
 - `Tutorial` — step-by-step technical guides (appears under the **Tutorials** pill)
 - `Perspective` — opinion pieces, field commentary (appears under the **Perspectives** pill)
+- `Paper Reviews` — write-ups summarising or critiquing a published paper (appears under the **Paper Reviews** pill)
 
 The homepage pill bar reads the `categories` taxonomy only, not `scope`. A post with `scope: ["tutorials"]` but `categories: ["Blog Post"]` will appear under the Blogs pill, not Tutorials.
 

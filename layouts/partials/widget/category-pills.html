@@ -31,12 +31,13 @@
     <a href="{{ site.Home.RelPermalink }}"
        class="category-pills__pill{{ if eq $currentCat "all" }} category-pills__pill--active{{ end }}"
        data-filter="all">All</a>
-    {{- range $cat := slice "Announcement" "Blog Post" "Tutorial" "Perspective" -}}
+    {{- range $cat := slice "Announcement" "Blog Post" "Tutorial" "Perspective" "Paper Reviews" -}}
       {{- $slug := . | urlize -}}
       {{- $label := "Perspectives" -}}
       {{- if eq . "Announcement" }}{{ $label = "Announcements" }}
       {{- else if eq . "Blog Post" }}{{ $label = "Blogs" }}
       {{- else if eq . "Tutorial" }}{{ $label = "Tutorials" }}
+      {{- else if eq . "Paper Reviews" }}{{ $label = "Paper Reviews" }}
       {{- end -}}
       {{- $isActive := eq $currentCat $slug -}}
       {{- $termPage := site.GetPage (printf "/categories/%s" $slug) -}}
