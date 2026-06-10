@@ -93,7 +93,7 @@ For each pair, the procedure is:
 
 This protocol is a direct extension of [Karollus 2023](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-02899-9) — most of it is bit-for-bit faithful to theirs. We reuse their Fulco et al. evaluation tables (`ziga_additional_columns.tsv` + `enhancer_knockdown_effects.tsv` from their [Zenodo release](https://zenodo.org/records/7613255)) with the same merge keys and validated-pair filtering, their TSS / enhancer / strand conventions, the same Enformer DeepMind checkpoint, and their K562 CAGE readout, central-bin aggregation, and Pearson/Spearman correlation framework. For Gasperini we apply the same protocol to the Cell 2019 high-confidence pairs (after hg19 → hg38 liftover). The model-specific adjustments — per-architecture aggregation conventions like 5×128 bp bins for Enformer, 20×32 bp for Borzoi, exon-mean for AlphaGenome RNA-Seq — are architecture-driven; the evaluation harness around them is the Karollus harness. Four deliberate departures from Karollus are flagged in [Limitations](#limitations).
 
-All four models are evaluated as a single forward pass per input — no ensembling across folds, seeds, or augmentations (test-time augmentations are explored separately for AlphaGenome below). Enformer uses the [lucidrains PyTorch port](https://github.com/lucidrains/enformer-pytorch) of the DeepMind weights — same weights as Karollus used, different framework wrapper. Borzoi predictions come from [Flashzoi](https://huggingface.co/johahi) at fold 0 — a community PyTorch port — rather than the 4-fold ensemble the original Borzoi paper uses. AlphaGenome uses the [PyTorch port](https://github.com/genomicsxai/alphagenome-pytorch) loaded with the all-fold distilled checkpoint, a single model trained to reproduce the multi-fold ensemble's behaviour. NTv3 is the [InstaDeepAI HuggingFace release](https://huggingface.co/InstaDeepAI/NTv3_650M_post).
+All four models are evaluated as a single forward pass per input — no ensembling across folds, seeds, or augmentations (test-time augmentations are explored separately for AlphaGenome below). Enformer uses the [lucidrains PyTorch port](https://github.com/lucidrains/enformer-pytorch) of the DeepMind weights — same weights as Karollus used, different framework wrapper. Borzoi predictions come from the [Flashzoi](https://huggingface.co/johahi) community PyTorch port, evaluated as the original paper's 4-fold ensemble (predictions averaged across the four published fold checkpoints). AlphaGenome uses the [PyTorch port](https://github.com/genomicsxai/alphagenome-pytorch) loaded with the all-fold distilled checkpoint, a single model trained to reproduce the multi-fold ensemble's behaviour. NTv3 is the [InstaDeepAI HuggingFace release](https://huggingface.co/InstaDeepAI/NTv3_650M_post).
 
 ---
 
@@ -108,7 +108,7 @@ The headline numbers (left two columns: each model on every pair its own recepti
 | Model       | Fulco — full    | Gasperini — full | Fulco — Enformer RF | Gasperini — Enformer RF |
 |-------------|----------------:|-----------------:|--------------------:|------------------------:|
 | Enformer    | 0.29 / 0.19     | 0.04 / 0.04      | 0.29 / 0.19         | 0.03 / 0.04             |
-| Borzoi      | 0.66 / 0.52     | 0.30 / 0.27      | 0.66 / 0.53         | 0.30 / 0.28             |
+| Borzoi      | 0.66 / 0.49     | 0.34 / 0.33      | 0.66 / 0.49         | 0.34 / 0.35             |
 | NTv3        | 0.34 / 0.09     | 0.12 / 0.14      | 0.34 / 0.09         | 0.13 / 0.17             |
 | AlphaGenome | **0.67 / 0.54** | **0.45 / 0.45**  | **0.67 / 0.54**     | **0.46 / 0.48**         |
 
@@ -156,7 +156,7 @@ The headline benchmark (Figures 2–5) doesn't use TTA, so all four models are c
 
 ### Does ensembling help?
 
-On the matched-RF (Receptive Field) set used in the headline table, a simple equal-weight average of the four models' predictions produces a mixed result: Pearson's r rises on Fulco (0.71, vs AlphaGenome's 0.67) but falls on Gasperini (0.41, vs 0.45). Equal-weight ensembling helps only when the models are comparably strong (Fulco); when one model dominates (AlphaGenome on Gasperini), averaging in the weaker models appears to dilute the overall predictive signal.
+On the matched-RF (Receptive Field) set used in the headline table, a simple equal-weight average of the four models' predictions produces a mixed result: Pearson's r rises on Fulco (0.70, vs AlphaGenome's 0.67) but falls on Gasperini (0.42, vs 0.45). Equal-weight ensembling helps only when the models are comparably strong (Fulco); when one model dominates (AlphaGenome on Gasperini), averaging in the weaker models appears to dilute the overall predictive signal.
 
 ---
 
@@ -167,15 +167,13 @@ A few things to flag about our analysis.
 **Differences from Karollus 2023.** We cross-checked our Enformer reimplementation against Karollus's original code line-by-line with an LLM ([Claude Opus 4.7](https://www.anthropic.com/)). Our Enformer numbers don't exactly match their published ones but the qualitative pattern is the same — Enformer underpredicts distal enhancer effects. Four deliberate departures from their approach may explain some of this gap:
 
 * **Window construction.** Karollus reads precomputed `sequence_start`/`sequence_end` from a fixed table, designed so both TSS and enhancer sit inside Enformer's central crop. We build the window on-the-fly as strict TSS-centred so that all models were compared equally.
-* **TTA only for AlphaGenome.** Karollus et al. applies TTA (6 forward passes per sequence) uniformly across all evaluated models. Our headline four-model comparison (Figures 2–5) runs each model once per sequence (51 forward passes per pair, counting the 50 shuffles), keeping all models on equal footing. We separately apply Karollus et al.'s TTA recipe to AlphaGenome (Figure 6) to characterise the stability gain, but we don't apply it to Enformer, Borzoi, or NTv3.
+* **TTA only for AlphaGenome.** Karollus et al. applies TTA (6 forward passes per sequence) uniformly across all evaluated models. Our headline four-model comparison (Figures 2–5) does not apply TTA to any model — each model is evaluated using its standard published setup: single forward pass for Enformer, NTv3, and AlphaGenome (the distilled checkpoint), and the 4-fold ensemble for Borzoi. We separately apply Karollus et al.'s 6-pass TTA recipe to AlphaGenome (Figure 6) to characterise the stability gain, but we don't apply it to Enformer, Borzoi, or NTv3.
 * **No N-replacement control.** Karollus also runs an all-N enhancer replacement (replacing every base with the "N" wildcard) as a stronger knockout than shuffling. We deliberately don't: while reference genomes do contain N regions (gaps, centromeres, hard-masked repeats), these are typically excluded or under-weighted in training pipelines for these models, so a 2 kb block of N embedded in an otherwise-normal genic context is anomalous input. Predictions there reflect how the model handles unfamiliar input, not how it responds to motif loss, which is the actual question. The dinucleotide shuffle keeps the model in-distribution and isolates the motif-loss signal cleanly.
 * **Linear vs. log<sub>2</sub> observed effect.** Karollus uses log<sub>2</sub>(1 + fraction_change); we report the linear fractional change and the log<sub>2</sub> observed effect. Spearman is identical; Pearson's r differs by a small log-vs-linear distortion.
 
 These methodological differences may shift absolute Pearson values, though broad model rankings should be unaffected.
 
 **Small Fulco sample (n ≈ 63).** Fulco et al.'s ~60 validated enhancer–gene pairs is small enough that correlation estimates carry wide confidence intervals — for r ≈ 0.65 at n = 63 the 95% CI spans roughly ±0.15 either side. Numerical differences within roughly ±0.05–0.10 (e.g., AlphaGenome 0.67 vs Borzoi 0.66 on Fulco Pearson) should be read as essentially tied, not as a meaningful ordering. Gasperini's ~440 pairs give tighter estimates, so the model gaps there are more reliable.
-
-**Single-fold Borzoi.** Borzoi's published numbers come from a 4-fold ensemble; ours come from a single fold (Flashzoi fold 0; see Model implementations above). The original ensemble (and the original implementation) may score higher, so these Borzoi numbers may understate full Borzoi ensemble capability.
 
 **K562 only.** Both screens are in K562, and K562 is heavily represented in every model's training data. None of these numbers say anything about how the models would do on cell types under-represented in training. We'd expect the gap between models, and between predictions and truth, to widen there.
 
@@ -200,7 +198,7 @@ The repo is set up so adding a fifth model is one new `scripts/test_<dataset>_<n
 * [Source code & evaluation scripts](https://github.com/Al-Murphy/seq2func_crispri_eval)
 * [Karollus et al., 2023 — the benchmark this extends](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-02899-9)
 * [SequenceModelBenchmark Zenodo (Karollus tables)](https://zenodo.org/records/7613255)
-* Models: [Enformer (PyTorch)](https://github.com/lucidrains/enformer-pytorch) · [Borzoi](https://github.com/calico/borzoi) (original) · [Flashzoi](https://huggingface.co/johahi) (Borzoi PyTorch port, fold 0 — used here) · [NTv3](https://huggingface.co/InstaDeepAI/NTv3_650M_post) · [AlphaGenome PyTorch port](https://github.com/genomicsxai/alphagenome-pytorch)
+* Models: [Enformer (PyTorch)](https://github.com/lucidrains/enformer-pytorch) · [Borzoi](https://github.com/calico/borzoi) (original) · [Flashzoi](https://huggingface.co/johahi) (Borzoi PyTorch port, 4-fold ensemble — used here) · [NTv3](https://huggingface.co/InstaDeepAI/NTv3_650M_post) · [AlphaGenome PyTorch port](https://github.com/genomicsxai/alphagenome-pytorch)
 
 ---
 
