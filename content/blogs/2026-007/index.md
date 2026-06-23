@@ -99,7 +99,7 @@ Each model is evaluated using its canonical published inference setup, with no t
 
 ## Results
 
-**AlphaGenome leads on both screens.** Figure 2 shows predicted vs. measured fractional knockdown for all four models on each screen, with points coloured by enhancer-to-TSS distance.
+**AlphaGenome leads, with Borzoi close behind on Fulco et al.** Figure 2 shows predicted vs. measured fractional knockdown for all four models on each screen, with points coloured by enhancer-to-TSS distance.
 
 ![Figure 2](crispri_fig1.png "width=900 Figure 2: Predicted vs. measured fractional knockdown for the four models on (a) Fulco et al., 2019 and (b) Gasperini et al., 2019. Points coloured by enhancer-to-TSS distance. AlphaGenome achieves the highest Pearson and Spearman correlations on both screens; on Gasperini, Enformer effectively fails and NTv3 trails the leaders by a wide margin. The dashed x = y line marks perfect prediction (predicted = observed); points falling below it indicate the model underestimates the experimental knockdown.")
 
