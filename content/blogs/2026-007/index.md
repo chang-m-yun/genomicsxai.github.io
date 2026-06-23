@@ -14,7 +14,7 @@ authors_display:
     affiliation: "Cold Spring Harbor Labs (CSHL)"
     orcid: "0000-0001-8722-0038"
 
-editor: "TBD"
+editor: "dwgoblue"
 submitter_github: "Al-Murphy"
 
 tags: ["genomics","crispri","alphagenome","borzoi","enformer","ntv3","seq2func","benchmarking"]
@@ -93,7 +93,7 @@ For each pair, the procedure is:
 
 This protocol is a direct extension of [Karollus 2023](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-02899-9) — most of it is bit-for-bit faithful to theirs. We reuse their Fulco et al. evaluation tables (`ziga_additional_columns.tsv` + `enhancer_knockdown_effects.tsv` from their [Zenodo release](https://zenodo.org/records/7613255)) with the same merge keys and validated-pair filtering, their TSS / enhancer / strand conventions, the same Enformer DeepMind checkpoint, and their K562 CAGE readout, central-bin aggregation, and Pearson/Spearman correlation framework. For Gasperini we apply the same protocol to the Cell 2019 high-confidence pairs (after hg19 → hg38 liftover). The model-specific adjustments — per-architecture aggregation conventions like 5×128 bp bins for Enformer, 20×32 bp for Borzoi, exon-mean for AlphaGenome RNA-Seq — are architecture-driven; the evaluation harness around them is the Karollus harness. Four deliberate departures from Karollus are flagged in [Limitations](#limitations).
 
-All four models are evaluated as a single forward pass per input — no ensembling across folds, seeds, or augmentations (test-time augmentations are explored separately for AlphaGenome below). Enformer uses the [lucidrains PyTorch port](https://github.com/lucidrains/enformer-pytorch) of the DeepMind weights — same weights as Karollus used, different framework wrapper. Borzoi predictions come from the [Flashzoi](https://huggingface.co/johahi) community PyTorch port, evaluated as the original paper's 4-fold ensemble (predictions averaged across the four published fold checkpoints). AlphaGenome uses the [PyTorch port](https://github.com/genomicsxai/alphagenome-pytorch) loaded with the all-fold distilled checkpoint, a single model trained to reproduce the multi-fold ensemble's behaviour. NTv3 is the [InstaDeepAI HuggingFace release](https://huggingface.co/InstaDeepAI/NTv3_650M_post).
+Each model is evaluated using its canonical published inference setup, with no test-time augmentations applied (TTA is explored separately for AlphaGenome below). Inference compute per pair therefore isn't uniform: Borzoi runs four forward passes (one per fold), while the other three run one — we compare models as their authors released them rather than artificially restrict Borzoi to a single fold. Enformer uses the [lucidrains PyTorch port](https://github.com/lucidrains/enformer-pytorch) of the DeepMind weights — same weights as Karollus used, different framework wrapper. Borzoi predictions come from the [Flashzoi](https://huggingface.co/johahi) community PyTorch port, evaluated as the original paper's 4-fold ensemble (predictions averaged across the four published fold checkpoints). AlphaGenome uses the [PyTorch port](https://github.com/genomicsxai/alphagenome-pytorch) loaded with the all-fold distilled checkpoint, a single model trained to reproduce the multi-fold ensemble's behaviour. NTv3 is the [InstaDeepAI HuggingFace release](https://huggingface.co/InstaDeepAI/NTv3_650M_post).
 
 ---
 
@@ -121,7 +121,7 @@ A few takeaways:
 * **AlphaGenome outperforms all other models** on both screens, though essentially tied with Borzoi on Fulco et al. — see the small-sample caveat in [Limitations](#limitations).
 * **Enformer and NTv3 struggle on Gasperini et al.** Enformer's shorter 196 kb context excludes ~20% of Gasperini et al. pairs, but even on the closer pairs, it manages near-zero correlation. NTv3 has a 1 Mb context, the same as AlphaGenome, but still trails the leaders by a wide margin — so context length isn't the explanation.
 * **On the same set of pairs, AlphaGenome still leads.** Of Gasperini et al.'s pairs, 21 fall within AlphaGenome's 1 Mb context but outside Borzoi's 524 kb — so they contribute to AG's correlation but not Borzoi's (Note, all of the tested Fulco et al. pairs are in Borzoi's context). To make the comparison apples-to-apples, we restrict AlphaGenome to only the pairs Borzoi can also score: Pearson's r 0.45 → 0.44, Spearman's ρ 0.45 → 0.45 — giving essentially the same result.
-* **The Gasperini et al. ceiling is low across the board.** Even AlphaGenome leaves substantial variance unexplained. Some of this is biological noise: Gasperini et al.'s pooled design puts multiple sgRNAs per cell, so any single enhancer's effect is measured in an already-perturbed cellular context, with trans effects from the other knockdowns adding noise to the readout. Fulco et al.'s CRISPRi-FlowFISH targets one enhancer at a time and is the cleaner ground truth — which may explain part of the per-screen performance gap. Either way, the headline framing is that AlphaGenome improves CRISPRi prediction but a large gap remains, especially for distal cis-regulatory elements (CREs).
+* **The Gasperini et al. ceiling is low across the board.** Even AlphaGenome leaves substantial variance unexplained. Some of this is likely measurement-side: Gasperini et al.'s scaled screen uses a high-MOI single-cell pooled design (median 28 gRNAs per cell), and the statistical and trans-perturbation challenges of high-MOI screens are well-documented ([Barry et al., 2021](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2)). Fulco et al.'s CRISPRi-FlowFISH targets one enhancer at a time with a bulk-population readout, which we'd expect to give more precise per-pair effect sizes. We can't separate measurement noise from model error from these correlations alone, so attributing the gap is interpretive — but it's at least consistent with the per-screen difference we see. Either way, the headline framing is that AlphaGenome improves CRISPRi prediction but a large gap remains, especially for distal cis-regulatory elements (CREs).
 
 ### Predictions shrink, knockdowns don't
 
@@ -204,17 +204,18 @@ The repo is set up so adding a fifth model is one new `scripts/test_<dataset>_<n
 
 ## References
 
-1. Avsec, Ž. et al. Effective gene expression prediction from sequence by integrating long-range interactions. _Nature Methods_, 18, 1196–1203 (2021).
-2. Linder, J. et al. Predicting RNA-seq coverage from DNA sequence as a unifying model of gene regulation. _Nature Genetics_, 56, 2532–2543 (2024).
+1. Avsec, Ž. et al. Effective gene expression prediction from sequence by integrating long-range interactions. _Nature Methods_, 18, 1196–1203 (2021). https://doi.org/10.1038/s41592-021-01252-x
+2. Linder, J. et al. Predicting RNA-seq coverage from DNA sequence as a unifying model of gene regulation. _Nature Genetics_, 57, 949–961 (2025). https://doi.org/10.1038/s41588-024-02053-6
 3. Boshar, S. et al. A foundational model for joint sequence-function multi-species modeling at scale for long-range genomic prediction. _bioRxiv_ (2025). https://doi.org/10.64898/2025.12.22.695963
-4. Avsec, Ž. et al. Advancing regulatory variant effect prediction with AlphaGenome. _Nature_ (2025). https://doi.org/10.1038/s41586-025-10014-0
-5. Karollus, A., Hingorani, N., Gagneur, J. Current sequence-to-expression models do not faithfully reflect cis-regulatory effects. _Genome Biology_, 24, 56 (2023).
-6. Fulco, C. P. et al. Activity-by-contact model of enhancer–promoter regulation from thousands of CRISPR perturbations. _Nature Genetics_, 51, 1664–1669 (2019).
-7. Gasperini, M. et al. A genome-wide framework for mapping gene regulation via cellular genetic screens. _Cell_, 176, 377–390.e19 (2019).
+4. Avsec, Ž. et al. Advancing regulatory variant effect prediction with AlphaGenome. _Nature_, 649, 1206–1218 (2026). https://doi.org/10.1038/s41586-025-10014-0
+5. Karollus, A., Mauermeier, T., Gagneur, J. Current sequence-based models capture gene expression determinants in promoters but mostly ignore distal enhancers. _Genome Biology_, 24, 56 (2023). https://doi.org/10.1186/s13059-023-02899-9
+6. Fulco, C. P. et al. Activity-by-contact model of enhancer–promoter regulation from thousands of CRISPR perturbations. _Nature Genetics_, 51, 1664–1669 (2019). https://doi.org/10.1038/s41588-019-0538-0
+7. Gasperini, M. et al. A genome-wide framework for mapping gene regulation via cellular genetic screens. _Cell_, 176, 377–390.e19 (2019). https://doi.org/10.1016/j.cell.2018.11.029
 8. Tu, X. et al. A modality gap in personal-genome prediction by sequence-to-function models. _bioRxiv_ (2026). https://doi.org/10.64898/2026.02.01.702969
 9. Shen, L. AlphaGenome enhances personal gene expression prediction but retains key limitations. _bioRxiv_ (2025). https://doi.org/10.1101/2025.08.05.668750
-10. Sasse, A., Ng, B., Spiro, A.E. et al. Benchmarking of deep neural networks for predicting personal gene expression from DNA sequence highlights shortcomings. Nat Genet 55, 2060–2064 (2023). https://doi.org/10.1038/s41588-023-01524-6
-11. Koo P.K., Majdandzic A., Ploenzke M., Anand P., Paul S.B. Global importance analysis: An interpretability method to quantify importance of genomic features in deep neural networks. _PLoS Comput Biology_, 17(5), e1008925 (2021). https://doi.org/10.1371/journal.pcbi.1008925
-12. Toneyan, S., Tang, Z. & Koo, P.K. Evaluating deep learning for predicting epigenomic profiles. _Nature Machine Intelligence_, 4, 1088–1100 (2022). https://doi.org/10.1038/s42256-022-00570-9
+10. Sasse, A., Ng, B., Spiro, A.E. et al. Benchmarking of deep neural networks for predicting personal gene expression from DNA sequence highlights shortcomings. _Nature Genetics_, 55, 2060–2064 (2023). https://doi.org/10.1038/s41588-023-01524-6
+11. Koo, P.K., Majdandzic, A., Ploenzke, M., Anand, P., Paul, S.B. Global importance analysis: An interpretability method to quantify importance of genomic features in deep neural networks. _PLoS Computational Biology_, 17(5), e1008925 (2021). https://doi.org/10.1371/journal.pcbi.1008925
+12. Toneyan, S., Tang, Z., Koo, P.K. Evaluating deep learning for predicting epigenomic profiles. _Nature Machine Intelligence_, 4, 1088–1100 (2022). https://doi.org/10.1038/s42256-022-00570-9
 13. Gschwind, A.R. et al. An encyclopedia of enhancer-gene regulatory interactions in the human genome. _bioRxiv_ (2023). https://doi.org/10.1101/2023.11.09.563812
 14. Cheng, W. et al. DNALONGBENCH: a benchmark suite for long-range DNA prediction tasks. _Nature Communications_, 16, 10108 (2025). https://doi.org/10.1038/s41467-025-65077-4
+15. Barry, T., Wang, X., Morris, J.A. et al. SCEPTRE improves calibration and sensitivity in single-cell CRISPR screen analysis. _Genome Biology_, 22, 344 (2021). https://doi.org/10.1186/s13059-021-02545-2
