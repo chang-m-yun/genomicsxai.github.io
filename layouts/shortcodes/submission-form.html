@@ -222,7 +222,7 @@
 
       <div class="submit-form__field">
         <label class="submit-form__label submit-form__label--required">Discipline</label>
-        <span class="submit-form__help">At least one required — promotes your post under the homepage Discipline filter.</span>
+        <span class="submit-form__help">At least one required — select all that apply. Promotes your post under the homepage Discipline filter(s).</span>
         <div class="submit-form__checkbox-group">
           {{- range $.Site.Data.disciplines }}
           <label class="submit-form__checkbox"><input type="checkbox" class="submit-form__editable submit-form__discipline" data-slug="{{ .slug }}" id="sf-discipline-{{ .slug }}"> {{ .label }}</label>

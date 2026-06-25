@@ -104,9 +104,11 @@ revision_history:
 
 Multiple levels of tagging; the homepage and lists support filtering by these.
 
-Examples: `genomics`, `spatial-omics`, `single-cell`, `diffusion-models`, `causal-inference`, `multi-modal`, `foundation-models`.
+Examples: `genomics`, `spatial-omics`, `single-cell`, `diffusion-models`, `causal-inference`, `multi-modal`, `foundation-models`, `AI-Agents`.
 
 Included in the frontmatter as: `tags: ["genomics", "causal-inference"]`.
+
+Some tags are elevated to first-class **disciplines** (curated in `data/disciplines.yaml`) and power the homepage Discipline filter. A post can belong to more than one discipline — just include each discipline's tag (e.g. `tags: ["single-cell", "AI-Agents"]`) and it will surface under all of them.
 
 ### 4.3 Scope
 

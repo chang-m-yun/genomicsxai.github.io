@@ -45,7 +45,7 @@ Ensure posts are **accurate, readable, appropriately tagged, and safe to publish
 ### D. Metadata and tagging
 
 * **`tags`** are relevant and consistent with the post
-* **At least one discipline tag** is present (`seq2func`, `context-seq2func`, `single-cell`, `synthetic-biology`, `interpretability`, `multi-omics`, or `experimental-design`) so the post surfaces under the homepage Discipline filter
+* **At least one discipline tag** is present (`seq2func`, `context-seq2func`, `single-cell`, `synthetic-biology`, `interpretability`, `multi-omics`, `experimental-design`, or `ai-agents`) so the post surfaces under the homepage Discipline filter — a post may carry more than one when it spans several disciplines
 * **`categories`** and **`scope`** reflect the piece
 * Title accurately reflects content
 
