@@ -131,6 +131,25 @@
       }
     }
   },
+  "2026-007": {
+    "conceptrecid": "20840269",
+    "current_revision": 1,
+    "current_doi": "10.5281/zenodo.20840270",
+    "current_doi_url": "https://doi.org/10.5281/zenodo.20840270",
+    "current_zenodo_url": "https://zenodo.org/records/20840270",
+    "current_deposition_id": 20840270,
+    "revisions": {
+      "1": {
+        "doi": "10.5281/zenodo.20840270",
+        "doi_url": "https://doi.org/10.5281/zenodo.20840270",
+        "zenodo_url": "https://zenodo.org/records/20840270",
+        "deposition_id": 20840270,
+        "record_id": 20840270,
+        "date": "2026-05-21",
+        "notes": "Initial submission"
+      }
+    }
+  },
   "2026-008": {
     "conceptrecid": "20347357",
     "current_revision": 1,
