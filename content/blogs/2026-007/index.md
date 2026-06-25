@@ -32,6 +32,7 @@ date_accepted: 2026-06-25
 date: 2026-06-25
 
 doi: ""
+zenodo_url: ""
 revision_history:
   - version: 1
     date: 2026-05-21
