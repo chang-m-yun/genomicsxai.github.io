@@ -24,12 +24,12 @@ scope: ["insights"]
 audience: ["within-field"]
 labs: ["Koo lab"]
 
-status: "submitted"
+status: "accepted"
 revision: 1
 
 date_submitted: 2026-05-21
-date_accepted:
-date: 2026-05-21
+date_accepted: 2026-06-25
+date: 2026-06-25
 
 doi: ""
 revision_history:
