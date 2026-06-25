@@ -1,0 +1,221 @@
+---
+post_id: "2026-007"
+title: "Benchmarking seq2func models on distal enhancer effects with CRISPRi screens"
+image: "crispri_fig1.png"
+math: false
+
+authors: ["Alan Murphy","Peter K. Koo"]
+
+authors_display:
+  - name: "Alan Murphy"
+    affiliation: "Cold Spring Harbor Labs (CSHL)"
+    orcid: "0000-0002-2487-8753"
+  - name: "Peter K. Koo"
+    affiliation: "Cold Spring Harbor Labs (CSHL)"
+    orcid: "0000-0001-8722-0038"
+
+editor: "dwgoblue"
+submitter_github: "Al-Murphy"
+
+tags: ["genomics","crispri","alphagenome","borzoi","enformer","ntv3","seq2func","benchmarking"]
+categories: ["Blog Post"]
+
+scope: ["insights"]
+audience: ["within-field"]
+labs: ["Koo lab"]
+
+status: "accepted"
+revision: 1
+
+date_submitted: 2026-05-21
+date_accepted: 2026-06-25
+date: 2026-06-25
+
+doi: ""
+revision_history:
+  - version: 1
+    date: 2026-05-21
+    notes: "Initial submission"
+---
+
+{{< summary >}}
+We benchmark four sequence-to-function genomic deep learning models — [Enformer](https://www.nature.com/articles/s41592-021-01252-x), [Borzoi](https://www.nature.com/articles/s41588-024-02053-6), [NTv3](https://www.biorxiv.org/content/10.64898/2025.12.22.695963v1), and [AlphaGenome](https://www.nature.com/articles/s41586-025-10014-0) — zero-shot on two K562 CRISPRi enhancer-knockdown screens ([Fulco et al., 2019](https://pubmed.ncbi.nlm.nih.gov/31784727/) and [Gasperini et al., 2019](https://pubmed.ncbi.nlm.nih.gov/30612741/)), extending the in-silico CRISPRi setup from [Karollus et al., 2023](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-02899-9).
+
+Three things stand out:
+
+* **AlphaGenome leads on both screens** (Pearson's r = 0.67 on Fulco et al., 0.45 on Gasperini et al.), with Borzoi a close second on Fulco et al. and a more distant second on Gasperini et al.
+* **All four models systematically underpredict knockdown magnitude**, and the gap to experimental measurements widens with enhancer-to-TSS distance — distal cis-regulatory element (CRE) effects remain difficult to predict.
+* **AlphaGenome's RNA-Seq head (with GENCODE-exon aggregation) beats its CAGE head** on the larger screen — which output track you choose matters.
+
+**Code**: [seq2func_crispri_eval](https://github.com/Al-Murphy/seq2func_crispri_eval)
+{{< /summary >}}
+
+---
+
+## Motivation
+
+Sequence-to-function (seq2func) models keep getting bigger, longer-context, and more capable. [AlphaGenome](https://www.nature.com/articles/s41586-025-10014-0) is the current state of the art, succeeding [Enformer](https://www.nature.com/articles/s41592-021-01252-x) (2021) and [Borzoi](https://www.nature.com/articles/s41588-024-02053-6) (2024). DNA language models like [NTv3](https://www.biorxiv.org/content/10.64898/2025.12.22.695963v1) now compete in the same space by post-training on the same functional genomic tracks.
+
+AlphaGenome was launched as a substantial step forward, with most of its zero-shot evaluation focused on single-nucleotide variant (SNV) effects. Two related weaknesses are especially well-documented for this class of model, both originally demonstrated on Enformer: predicting expression across **personalised genomes** (e.g. [Sasse et al.](https://www.nature.com/articles/s41588-023-01524-6)), and predicting **distal CRE effect magnitudes** (how much knocking down a far-away enhancer changes its target gene's expression). Both involve sequence perturbations the model wasn't directly trained on, and both are where seq2func models historically struggle. Performance on these tasks is what tells us whether a model's apparent advance translates to the questions biologists actually care about.
+
+The personalised genome question is how well a model predicts gene expression for a specific individual from their own genome. It's hard because the variants that distinguish one individual from the reference are sparse and small in effect, easy to lose against the much stronger reference signal a sequence model is trained to predict. [Tu, 2026](https://www.biorxiv.org/content/10.64898/2026.02.01.702969v1.full) and [Shen, 2025](https://www.biorxiv.org/content/10.1101/2025.08.05.668750v2.full) recently revisited it: AlphaGenome improves over Enformer on this task, but still falls well short of useful accuracy. The needle moves, but there's a long way to go.
+
+The distal-CRE magnitude question — much bigger perturbations, disabling a whole regulatory element — has received little attention since [Karollus et al., 2023](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-02899-9). They defined an _in-silico_ CRISPRi benchmark on [Fulco 2019](https://pubmed.ncbi.nlm.nih.gov/31784727/) and [Gasperini 2019](https://pubmed.ncbi.nlm.nih.gov/30612741/) and ran it on Enformer and Basenji2, finding both substantially undershoot real enhancer effects. Borzoi, NTv3, and AlphaGenome have all followed Enformer, claiming gains from longer contexts and broader predictive tasks — yet none have been evaluated on Karollus's magnitude benchmark.
+
+A related but easier task — enhancer-gene linking — has been tested more widely: in the original Enformer paper (Figure 1a), in AlphaGenome's evaluation on the [ENCODE-rE2G CRISPRi dataset](https://www.biorxiv.org/content/10.1101/2023.11.09.563812v1) (Figure 1b), and in the [DNALONGBENCH](https://www.nature.com/articles/s41467-025-65077-4) benchmark. Linking is binary classification: does enhancer X regulate gene Y? A model succeeds by sorting interacting from non-interacting pairs above some threshold. Magnitude prediction is regression: how much does Y drop when X is disabled? It demands ranked and calibrated effect sizes across a continuous range, committing the model to a quantitative theory of enhancer-promoter regulation rather than a topological one. AlphaGenome leads on linking and notes that even it underestimates the impact of very distal enhancers — but doesn't run the magnitude-prediction benchmark.
+
+![Figure 1](enf_ag_crispr_orig_pprs.png "width=900 Figure 1: Enhancer-gene linking performance from the original Enformer and AlphaGenome publications. (a) Adapted from Avsec et al. 2021 (Enformer): enhancer–gene pair classification performance (CRISPRi-validated versus non-validated candidate enhancers), stratified by relative distance, measured by auPRC on two CRISPRi datasets for different methods, models, and contribution scores. (b) Adapted from Avsec et al. 2025 (AlphaGenome): zero-shot enhancer-gene linking performance on the ENCODE-rE2G CRISPRi dataset (auPRC), stratified by enhancer-to-TSS distance.")
+
+We aim to address this. We re-run the Karollus benchmark on AlphaGenome, Borzoi, and NTv3 — and on Enformer, to anchor against Karollus's original numbers. The result is a measure of progress on distal-CRE prediction across the last four years of seq2func releases, not just a test of AlphaGenome's generalisation abilities.
+
+> _Side note:_ CRISPRi (CRISPR interference) uses a catalytically dead Cas9 fused to a repressive domain to silence a target locus without cutting DNA. When the target is a distal enhancer, you can read out which genes go down in expression — giving you a measured enhancer → gene effect size.
+
+> _Side note:_ "seq2func" = sequence-to-function. A model that takes raw DNA as input and predicts functional genomic signals (RNA-seq, CAGE, ATAC, ChIP, etc.) as output. Enformer, Borzoi, and AlphaGenome were all trained end-to-end as seq2func models. NTv3 is a hybrid: first pretrained as a genomic language model (gLM) via masked language modeling — predicting hidden bases from their surrounding sequence across many species' genomes — then post-trained on functional assays to produce seq2func outputs.
+
+---
+
+## The benchmark
+
+We test on two K562 CRISPRi enhancer screens:
+
+* **[Fulco et al., 2019](https://pubmed.ncbi.nlm.nih.gov/31784727/)** — ~60 validated enhancer–gene pairs from K562 CRISPRi-FlowFISH. Small but high-confidence.
+* **[Gasperini et al., 2019](https://pubmed.ncbi.nlm.nih.gov/30612741/)** — ~440 high-confidence significant pairs from pooled K562 CRISPRi at scale.
+
+For each pair, the procedure is:
+
+1. Build a sequence window of the model's native context (196 kb for Enformer, 524 kb for Borzoi, 1 Mb for NTv3 and AlphaGenome), centred on the gene's TSS.
+2. Score the wild-type window.
+3. Dinucleotide-shuffle a 2 kb slice covering the enhancer. Repeat N = 50 times, average the model's prediction.
+4. Aggregate the model output over K562 RNA-Seq tracks in a TSS-centred 640 bp window. For AlphaGenome we additionally use the mean signal across GENCODE exons of the target gene (their paper's preferred RNA-Seq score).
+5. Score `pred_delta = (WT − mean(shuffle)) / WT` per pair and correlate with the measured fractional knockdown.
+
+> _Side note_: This is a marginalisation procedure — by averaging predictions across many randomised backgrounds in which the enhancer's motif content is destroyed, we isolate the enhancer's contribution from the surrounding sequence context (the same idea underlies Global Importance Analysis (GIA); [Koo et al., 2021](https://pmc.ncbi.nlm.nih.gov/articles/PMC8118286/)). The background choice matters: N-replacement is out-of-distribution for the model and can produce strange predictions; drawing random bases changes local G+C content, biasing on composition rather than motif loss; even a plain base shuffle destroys dinucleotide frequencies like CpG counts, themselves a learned regulatory signal. Dinucleotide shuffling (Altschul–Erickson) destroys motif content while keeping both single-base and dinucleotide composition intact — the standard background for in-silico CRISPRi.
+
+This protocol is a direct extension of [Karollus 2023](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-02899-9) — most of it is bit-for-bit faithful to theirs. We reuse their Fulco et al. evaluation tables (`ziga_additional_columns.tsv` + `enhancer_knockdown_effects.tsv` from their [Zenodo release](https://zenodo.org/records/7613255)) with the same merge keys and validated-pair filtering, their TSS / enhancer / strand conventions, the same Enformer DeepMind checkpoint, and their K562 CAGE readout, central-bin aggregation, and Pearson/Spearman correlation framework. For Gasperini we apply the same protocol to the Cell 2019 high-confidence pairs (after hg19 → hg38 liftover). The model-specific adjustments — per-architecture aggregation conventions like 5×128 bp bins for Enformer, 20×32 bp for Borzoi, exon-mean for AlphaGenome RNA-Seq — are architecture-driven; the evaluation harness around them is the Karollus harness. Four deliberate departures from Karollus are flagged in [Limitations](#limitations).
+
+Each model is evaluated using its canonical published inference setup, with no test-time augmentations applied (TTA is explored separately for AlphaGenome below). Inference compute per pair therefore isn't uniform: Borzoi runs four forward passes (one per fold), while the other three run one — we compare models as their authors released them rather than artificially restrict Borzoi to a single fold. Enformer uses the [lucidrains PyTorch port](https://github.com/lucidrains/enformer-pytorch) of the DeepMind weights — same weights as Karollus used, different framework wrapper. Borzoi predictions come from the [Flashzoi](https://huggingface.co/johahi) community PyTorch port, evaluated as the original paper's 4-fold ensemble (predictions averaged across the four published fold checkpoints). AlphaGenome uses the [PyTorch port](https://github.com/genomicsxai/alphagenome-pytorch) loaded with the all-fold distilled checkpoint, a single model trained to reproduce the multi-fold ensemble's behaviour. NTv3 is the [InstaDeepAI HuggingFace release](https://huggingface.co/InstaDeepAI/NTv3_650M_post).
+
+---
+
+## Results
+
+**AlphaGenome leads, with Borzoi close behind on Fulco et al.** Figure 2 shows predicted vs. measured fractional knockdown for all four models on each screen, with points coloured by enhancer-to-TSS distance.
+
+![Figure 2](crispri_fig1.png "width=900 Figure 2: Predicted vs. measured fractional knockdown for the four models on (a) Fulco et al., 2019 and (b) Gasperini et al., 2019. Points coloured by enhancer-to-TSS distance. AlphaGenome achieves the highest Pearson and Spearman correlations on both screens; on Gasperini, Enformer effectively fails and NTv3 trails the leaders by a wide margin. The dashed x = y line marks perfect prediction (predicted = observed); points falling below it indicate the model underestimates the experimental knockdown.")
+
+The headline numbers (left two columns: each model on every pair its own receptive field can reach; right two columns: every model restricted to Enformer's 196 kb receptive field, so all four score the same set of pairs):
+
+| Model       | Fulco — full    | Gasperini — full | Fulco — Enformer RF | Gasperini — Enformer RF |
+|-------------|----------------:|-----------------:|--------------------:|------------------------:|
+| Enformer    | 0.29 / 0.19     | 0.04 / 0.04      | 0.29 / 0.19         | 0.03 / 0.04             |
+| Borzoi      | 0.66 / 0.49     | 0.34 / 0.33      | 0.66 / 0.49         | 0.34 / 0.35             |
+| NTv3        | 0.34 / 0.09     | 0.12 / 0.14      | 0.34 / 0.09         | 0.13 / 0.17             |
+| AlphaGenome | **0.67 / 0.54** | **0.45 / 0.45**  | **0.67 / 0.54**     | **0.46 / 0.48**         |
+
+Values are Pearson's _r_ / Spearman's ρ. N pairs in the "full" columns varies by model because larger-context models score extra distal pairs that Enformer can't see (Fulco N = 62–63, Gasperini N = 352–438); in the "Enformer RF (Receptive Field)" columns N is uniform (Fulco et al. N = 62, Gasperini et al. N = 352), restricted to the enhancers Enformer predicts.
+
+The matched-RF columns rule out the simple "they just see more sequence" explanation for AlphaGenome and Borzoi's lead: Fulco et al. barely moves (only one distal pair drops), and on Gasperini et al. the rankings are unchanged — AlphaGenome even nudges up slightly (Pearson 0.45 → 0.46, Spearman 0.45 → 0.48).
+
+A few takeaways:
+
+* **AlphaGenome outperforms all other models** on both screens, though essentially tied with Borzoi on Fulco et al. — see the small-sample caveat in [Limitations](#limitations).
+* **Enformer and NTv3 struggle on Gasperini et al.** Enformer's shorter 196 kb context excludes ~20% of Gasperini et al. pairs, but even on the closer pairs, it manages near-zero correlation. NTv3 has a 1 Mb context, the same as AlphaGenome, but still trails the leaders by a wide margin — so context length isn't the explanation.
+* **On the same set of pairs, AlphaGenome still leads.** Of Gasperini et al.'s pairs, 21 fall within AlphaGenome's 1 Mb context but outside Borzoi's 524 kb — so they contribute to AG's correlation but not Borzoi's (Note, all of the tested Fulco et al. pairs are in Borzoi's context). To make the comparison apples-to-apples, we restrict AlphaGenome to only the pairs Borzoi can also score: Pearson's r 0.45 → 0.44, Spearman's ρ 0.45 → 0.45 — giving essentially the same result.
+* **The Gasperini et al. ceiling is low across the board.** Even AlphaGenome leaves substantial variance unexplained. Some of this is likely measurement-side: Gasperini et al.'s scaled screen uses a high-MOI single-cell pooled design (median 28 gRNAs per cell), and the statistical and trans-perturbation challenges of high-MOI screens are well-documented ([Barry et al., 2021](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2)). Fulco et al.'s CRISPRi-FlowFISH targets one enhancer at a time with a bulk-population readout, which we'd expect to give more precise per-pair effect sizes. We can't separate measurement noise from model error from these correlations alone, so attributing the gap is interpretive — but it's at least consistent with the per-screen difference we see. Either way, the headline framing is that AlphaGenome improves CRISPRi prediction but a large gap remains, especially for distal cis-regulatory elements (CREs).
+
+### Predictions shrink, knockdowns don't
+
+Figure 3 plots observed and predicted effect against enhancer-to-TSS distance, to more closely match [Karollus et al.'s plotting style](https://link.springer.com/article/10.1186/s13059-023-02899-9/figures/5).
+
+![Figure 3](crispri_fig2.png "width=900 Figure 3: Observed (grey) and predicted (blue) effect (y-axis) vs. enhancer-to-TSS distance (x-axis). Predictions are systematically smaller than observed knockdowns across all four models, and the gap widens at distal distances.")
+
+Two patterns hold across all four models:
+
+* **Predictions are systematically smaller in magnitude than observed knockdowns.** Even where the rank ordering is right (good Spearman), the predicted effect sizes are compressed.
+* **The gap grows with distance.** Models capture some of the distance-decay biology, but the slope is shallower than the data demands — most obviously for Enformer and NTv3, less so for AlphaGenome.
+
+A short aside: AlphaGenome's RNA-Seq head, aggregated as the mean signal across the target gene's GENCODE exons (their paper's preferred approach), beats AlphaGenome's CAGE head on Gasperini et al. (Pearson's r 0.45 vs. 0.39). On Fulco et al. the difference is small (0.67 vs. 0.66). So if you're benchmarking a new model on these screens, your output-aggregation choice should be considered carefully!
+
+![Figure 4](crispri_suppfig2.png "width=900 Figure 4: Predicted vs. measured fractional knockdown for Enformer and AlphaGenome CAGE track and RNA-Seq track on (a) Fulco et al., 2019 and (b) Gasperini et al., 2019. Points coloured by enhancer-to-TSS distance. AlphaGenome's RNA-Seq head with GENCODE-exon aggregation beats its CAGE head on Gasperini et al. and is comparable on Fulco et al. The dashed x = y line marks perfect prediction (predicted = observed); points falling below it indicate the model underestimates the experimental knockdown.")
+
+### Scoring it two ways
+
+A second aside: we computed the predicted effect two ways. Figure 2 used the linear `pred_delta = (WT − mean(shuffle)) / WT`. We also computed log<sub>2</sub>(WT / mean(shuffle)) against −log<sub>2</sub>(1 − y_delta) — a log fold-change scaling that de-emphasises a few high-end outliers. Figure 5 shows the log<sub>2</sub> version. Spearman is identical between the two scorings (rank-invariant); Pearson can shift noticeably, especially on Gasperini, and AlphaGenome and Borzoi narrowly swap order on Fulco — though the broad picture (AlphaGenome and Borzoi well above NTv3) is robust.
+
+![Figure 5](crispri_suppfig1.png "width=900 Figure 5: Predicted vs. measured knockdown on the log2 alignment scale (log2(WT / mean(shuffle)) vs. −log2(1 − y_delta)) for Borzoi, NTv3, and AlphaGenome on (a) Fulco et al., 2019 and (b) Gasperini et al., 2019. Enformer omitted. Points coloured by enhancer-to-TSS distance. Model ranking matches Figure 2; Pearson can shift on Gasperini, and AlphaGenome and Borzoi swap order on Fulco. Spearman's ρ is identical between the two scorings. The dashed x = y line marks perfect prediction (predicted = observed); points falling below it indicate the model underestimates the experimental knockdown.")
+
+### Test-time augmentation: stabilising AlphaGenome
+
+Karollus et al.'s original benchmark applies **test-time augmentations (TTA)** — for each sequence, run the model on 3 small offsets (−43, 0, +43 bp) crossed with both orientations (forward + reverse-complement), then average the 6 predictions. The 43 bp shift isn't arbitrary: Enformer's output is binned at 128 bp, and 128 / 3 ≈ 43, so the three offsets sample the TSS at roughly even thirds within its bin, averaging out where exactly the landmark falls. Genomic seq2func models have small but real positional sensitivity — predictions wobble across shifts — and TTA reliably damps this. Past work has shown the same effect in adjacent settings ([Toneyan et al., 2022](https://www.nature.com/articles/s42256-022-00570-9)).
+
+> _Side note:_ Test-time augmentation (TTA) means running the model on slightly perturbed versions of the same input and averaging the outputs, so the final prediction is less dependent on incidental properties like exact bin alignment or input orientation.
+
+The headline benchmark (Figures 2–5) doesn't use TTA, so all four models are compared on equal footing. To see what stabilising AlphaGenome's predictions buys on this task, we ran a separate analysis applying Karollus et al.'s 6-pass recipe to AlphaGenome alone. Figure 6 shows the result: TTA improves AlphaGenome's headline correlations on both screens, lifting Pearson's r on Fulco from 0.67 to 0.69 and Spearman on Gasperini from 0.45 to 0.47.
+
+![Figure 6](crispri_suppfig3.png "width=900 Figure 6: AlphaGenome predicted vs. measured fractional knockdown on (a) Fulco et al., 2019 and (b) Gasperini et al., 2019, without test time augmentations (TTA) (middle) versus with 6-pass TTA (3 shifts × 2 orientations, averaged; right). Points coloured by enhancer-to-TSS distance. TTA modestly improves AlphaGenome's correlations on both screens — most visibly Fulco Pearson (0.67 → 0.69) and Gasperini Spearman (0.45 → 0.47); the other metrics are essentially unchanged. Enformer without TTA included for context. The dashed x = y line marks perfect prediction (predicted = observed); points falling below it indicate the model underestimates the experimental knockdown.")
+
+### Does ensembling help?
+
+On the matched-RF (Receptive Field) set used in the headline table, a simple equal-weight average of the four models' predictions produces a mixed result: Pearson's r rises on Fulco (0.70, vs AlphaGenome's 0.67) but falls on Gasperini (0.42, vs 0.45). Equal-weight ensembling helps only when the models are comparably strong (Fulco); when one model dominates (AlphaGenome on Gasperini), averaging in the weaker models appears to dilute the overall predictive signal.
+
+---
+
+## Limitations
+
+A few things to flag about our analysis.
+
+**Differences from Karollus 2023.** We cross-checked our Enformer reimplementation against Karollus's original code line-by-line with an LLM ([Claude Opus 4.7](https://www.anthropic.com/)). Our Enformer numbers don't exactly match their published ones but the qualitative pattern is the same — Enformer underpredicts distal enhancer effects. Four deliberate departures from their approach may explain some of this gap:
+
+* **Window construction.** Karollus reads precomputed `sequence_start`/`sequence_end` from a fixed table, designed so both TSS and enhancer sit inside Enformer's central crop. We build the window on-the-fly as strict TSS-centred so that all models were compared equally.
+* **TTA only for AlphaGenome.** Karollus et al. applies TTA (6 forward passes per sequence) uniformly across all evaluated models. Our headline four-model comparison (Figures 2–5) does not apply TTA to any model — each model is evaluated using its standard published setup: single forward pass for Enformer, NTv3, and AlphaGenome (the distilled checkpoint), and the 4-fold ensemble for Borzoi. We separately apply Karollus et al.'s 6-pass TTA recipe to AlphaGenome (Figure 6) to characterise the stability gain, but we don't apply it to Enformer, Borzoi, or NTv3.
+* **No N-replacement control.** Karollus also runs an all-N enhancer replacement (replacing every base with the "N" wildcard) as a stronger knockout than shuffling. We deliberately don't: while reference genomes do contain N regions (gaps, centromeres, hard-masked repeats), these are typically excluded or under-weighted in training pipelines for these models, so a 2 kb block of N embedded in an otherwise-normal genic context is anomalous input. Predictions there reflect how the model handles unfamiliar input, not how it responds to motif loss, which is the actual question. The dinucleotide shuffle keeps the model in-distribution and isolates the motif-loss signal cleanly.
+* **Linear vs. log<sub>2</sub> observed effect.** Karollus uses log<sub>2</sub>(1 + fraction_change); we report the linear fractional change and the log<sub>2</sub> observed effect. Spearman is identical; Pearson's r differs by a small log-vs-linear distortion.
+
+These methodological differences may shift absolute Pearson values, though broad model rankings should be unaffected.
+
+**Small Fulco sample (n ≈ 63).** Fulco et al.'s ~60 validated enhancer–gene pairs is small enough that correlation estimates carry wide confidence intervals — for r ≈ 0.65 at n = 63 the 95% CI spans roughly ±0.15 either side. Numerical differences within roughly ±0.05–0.10 (e.g., AlphaGenome 0.67 vs Borzoi 0.66 on Fulco Pearson) should be read as essentially tied, not as a meaningful ordering. Gasperini's ~440 pairs give tighter estimates, so the model gaps there are more reliable.
+
+**K562 only.** Both screens are in K562, and K562 is heavily represented in every model's training data. None of these numbers say anything about how the models would do on cell types under-represented in training. We'd expect the gap between models, and between predictions and truth, to widen there.
+
+**In-silico ≠ real CRISPRi.** Dinucleotide shuffling destroys motif content but doesn't capture chromatin context changes, dCas9 occupancy, or 3D genome reorganisation. It's a motif-loss proxy, not a full simulation. Karollus discusses this; worth keeping in mind when reading the numbers.
+
+**CRISPRi isn't purely cis.** Knocking down an enhancer can affect other nearby genes, or the target gene's own regulatory partners, whose altered expression shifts the cellular context against which we measure the target. Part of any measured enhancer effect is downstream of these indirect (trans) effects, which a sequence-only model predicting from a TSS-centred window can't capture.
+
+---
+
+## Implications
+
+The benchmark tests seq2func models on experimentally validated distal enhancer-promoter interactions. AlphaGenome's gains over Enformer on distal CRE effect-magnitude prediction are substantial, and most pronounced on the larger Gasperini et al. screen. That's real progress. But the headline finding — that even AlphaGenome underestimates the magnitude of distal-enhancer effects — converges with what AlphaGenome's own paper observed on the easier enhancer-gene linking task on ENCODE-rE2G: distal CREs remain hard from two distinct evaluation angles. Fully benchmarking seq2func models on distal CRE effect magnitudes will require follow-up CRISPRi screens in cell lines beyond K562 — without them, we can't tell which gains generalise.
+
+Echoing [Tu, 2026](https://www.biorxiv.org/content/10.64898/2026.02.01.702969v1.full) and [Shen, 2025](https://www.biorxiv.org/content/10.1101/2025.08.05.668750v2.full) from a different angle: AlphaGenome improves CRISPRi effect prediction, but the remaining gap — especially for distal CREs — is still an open problem for the field.
+
+The repo is set up so adding a fifth model is one new `scripts/test_<dataset>_<newmodel>.py` writing a CSV with `y_delta` and `pred_delta` columns. If you've got a model you want to test, we'd love to see it!
+
+---
+
+## Code and links
+
+* [Source code & evaluation scripts](https://github.com/Al-Murphy/seq2func_crispri_eval)
+* [Karollus et al., 2023 — the benchmark this extends](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-02899-9)
+* [SequenceModelBenchmark Zenodo (Karollus tables)](https://zenodo.org/records/7613255)
+* Models: [Enformer (PyTorch)](https://github.com/lucidrains/enformer-pytorch) · [Borzoi](https://github.com/calico/borzoi) (original) · [Flashzoi](https://huggingface.co/johahi) (Borzoi PyTorch port, 4-fold ensemble — used here) · [NTv3](https://huggingface.co/InstaDeepAI/NTv3_650M_post) · [AlphaGenome PyTorch port](https://github.com/genomicsxai/alphagenome-pytorch)
+
+---
+
+## References
+
+1. Avsec, Ž. et al. Effective gene expression prediction from sequence by integrating long-range interactions. _Nature Methods_, 18, 1196–1203 (2021). https://doi.org/10.1038/s41592-021-01252-x
+2. Linder, J. et al. Predicting RNA-seq coverage from DNA sequence as a unifying model of gene regulation. _Nature Genetics_, 57, 949–961 (2025). https://doi.org/10.1038/s41588-024-02053-6
+3. Boshar, S. et al. A foundational model for joint sequence-function multi-species modeling at scale for long-range genomic prediction. _bioRxiv_ (2025). https://doi.org/10.64898/2025.12.22.695963
+4. Avsec, Ž. et al. Advancing regulatory variant effect prediction with AlphaGenome. _Nature_, 649, 1206–1218 (2026). https://doi.org/10.1038/s41586-025-10014-0
+5. Karollus, A., Mauermeier, T., Gagneur, J. Current sequence-based models capture gene expression determinants in promoters but mostly ignore distal enhancers. _Genome Biology_, 24, 56 (2023). https://doi.org/10.1186/s13059-023-02899-9
+6. Fulco, C. P. et al. Activity-by-contact model of enhancer–promoter regulation from thousands of CRISPR perturbations. _Nature Genetics_, 51, 1664–1669 (2019). https://doi.org/10.1038/s41588-019-0538-0
+7. Gasperini, M. et al. A genome-wide framework for mapping gene regulation via cellular genetic screens. _Cell_, 176, 377–390.e19 (2019). https://doi.org/10.1016/j.cell.2018.11.029
+8. Tu, X. et al. A modality gap in personal-genome prediction by sequence-to-function models. _bioRxiv_ (2026). https://doi.org/10.64898/2026.02.01.702969
+9. Shen, L. AlphaGenome enhances personal gene expression prediction but retains key limitations. _bioRxiv_ (2025). https://doi.org/10.1101/2025.08.05.668750
+10. Sasse, A., Ng, B., Spiro, A.E. et al. Benchmarking of deep neural networks for predicting personal gene expression from DNA sequence highlights shortcomings. _Nature Genetics_, 55, 2060–2064 (2023). https://doi.org/10.1038/s41588-023-01524-6
+11. Koo, P.K., Majdandzic, A., Ploenzke, M., Anand, P., Paul, S.B. Global importance analysis: An interpretability method to quantify importance of genomic features in deep neural networks. _PLoS Computational Biology_, 17(5), e1008925 (2021). https://doi.org/10.1371/journal.pcbi.1008925
+12. Toneyan, S., Tang, Z., Koo, P.K. Evaluating deep learning for predicting epigenomic profiles. _Nature Machine Intelligence_, 4, 1088–1100 (2022). https://doi.org/10.1038/s42256-022-00570-9
+13. Gschwind, A.R. et al. An encyclopedia of enhancer-gene regulatory interactions in the human genome. _bioRxiv_ (2023). https://doi.org/10.1101/2023.11.09.563812
+14. Cheng, W. et al. DNALONGBENCH: a benchmark suite for long-range DNA prediction tasks. _Nature Communications_, 16, 10108 (2025). https://doi.org/10.1038/s41467-025-65077-4
+15. Barry, T., Wang, X., Morris, J.A. et al. SCEPTRE improves calibration and sensitivity in single-cell CRISPR screen analysis. _Genome Biology_, 22, 344 (2021). https://doi.org/10.1186/s13059-021-02545-2
