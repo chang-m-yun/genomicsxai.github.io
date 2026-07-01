@@ -1,8 +1,11 @@
 name: Credit PR reviewers
 
-# When a PR touching a blog post is merged, add every reviewer (formal reviews
-# + inline review-comment authors) to that post's `editor:` frontmatter list,
-# unless they are already listed. Reviewers are recorded as GitHub logins.
+# When a PR touching a blog post is merged, add every editor who reviewed it to
+# that post's `editor:` frontmatter list, unless already listed. "Reviewed"
+# means any of: a formal review, an inline review comment, or a conversation
+# comment on the PR. Candidates are gated on membership of the
+# @genomicsxai/editors team, so authors and community members who comment are
+# never added. Editors are recorded as GitHub logins.
 #
 # `editor:` is a metadata-only field (not rendered on the site), stored as a
 # YAML flow list, e.g. `editor: ["dwgoblue", "Al-Murphy"]`. A legacy single
@@ -40,6 +43,8 @@ jobs:
       - name: Credit reviewers on changed blog posts
         env:
           GH_TOKEN: ${{ github.token }}
+          # read:org token, used only to read the editors team roster.
+          EDITORS_TOKEN: ${{ secrets.GH_EDITORS_TOKEN }}
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number || github.event.inputs.pr }}
         run: |
@@ -48,38 +53,50 @@ jobs:
 
           repo = os.environ["REPO"]
           pr = os.environ["PR"]
+          editors_token = os.environ.get("EDITORS_TOKEN", "")
 
-          def gh(path, jq):
+          def gh(path, jq, token=None):
+              env = os.environ.copy()
+              if token:
+                  env["GH_TOKEN"] = token
               out = subprocess.run(
-                  ["gh", "api", "--paginate", f"/repos/{repo}/{path}", "-q", jq],
-                  capture_output=True, text=True, check=True,
+                  ["gh", "api", "--paginate", path, "-q", jq],
+                  capture_output=True, text=True, check=True, env=env,
               ).stdout
               return [l.strip() for l in out.splitlines() if l.strip()]
 
+          # Only credit members of the @genomicsxai/editors team. If the roster
+          # can't be read, skip rather than risk crediting non-editors.
+          roster = {l.lower() for l in
+                    gh("/orgs/genomicsxai/teams/editors/members", ".[].login",
+                       token=editors_token)} if editors_token else set()
+          if not roster:
+              print("Could not read editor team roster — skipping to avoid crediting non-editors.")
+              raise SystemExit(0)
+
           # Blog posts changed by this PR (content/blogs/<slug>/index.md only).
-          changed = [f for f in gh(f"pulls/{pr}/files", ".[].filename")
+          changed = [f for f in gh(f"/repos/{repo}/pulls/{pr}/files", ".[].filename")
                      if re.match(r"^content/blogs/[^/]+/index\.md$", f)]
           if not changed:
               print("No blog posts changed in this PR — nothing to credit.")
               raise SystemExit(0)
 
-          # Reviewers = formal review authors + inline review-comment authors.
-          logins = set(gh(f"pulls/{pr}/reviews", ".[].user.login"))
-          logins |= set(gh(f"pulls/{pr}/comments", ".[].user.login"))
+          # Reviewed = formal review, inline review comment, or conversation comment.
+          logins = set(gh(f"/repos/{repo}/pulls/{pr}/reviews", ".[].user.login"))
+          logins |= set(gh(f"/repos/{repo}/pulls/{pr}/comments", ".[].user.login"))
+          logins |= set(gh(f"/repos/{repo}/issues/{pr}/comments", ".[].user.login"))
 
           # The PR author reviewing their own post doesn't count.
-          pr_author = subprocess.run(
-              ["gh", "api", f"/repos/{repo}/pulls/{pr}", "-q", ".user.login"],
-              capture_output=True, text=True, check=True,
-          ).stdout.strip().lower()
+          pr_author = gh(f"/repos/{repo}/pulls/{pr}", ".user.login")[0].lower()
 
-          # Drop bots and the author; keep a stable, deterministic order.
+          # Keep only editors; drop bots and the author. Stable order.
           reviewers = sorted(
               l for l in logins
-              if l and not l.endswith("[bot]") and l.lower() != pr_author
+              if l and not l.endswith("[bot]")
+              and l.lower() != pr_author and l.lower() in roster
           )
           if not reviewers:
-              print("No eligible reviewers found on this PR.")
+              print("No eligible editor-reviewers found on this PR.")
               raise SystemExit(0)
 
           def parse_list(val):
@@ -110,7 +127,7 @@ jobs:
               to_add = [r for r in reviewers
                         if r.lower() not in existing and r.lower() != submitter]
               if not to_add:
-                  print(f"{path}: reviewers already credited, no change.")
+                  print(f"{path}: editor-reviewers already credited, no change.")
                   continue
 
               merged = current + to_add
