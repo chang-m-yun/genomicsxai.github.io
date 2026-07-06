@@ -11,7 +11,7 @@ authors_display:
     affiliation: "Genomics × AI"
     orcid: ""
 
-editor: "Genomics X AI Editors"
+editor: ["Genomics X AI Editors", "aduranu", "Al-Murphy"]
 
 tags: ["genomics", "AI", "community"]
 categories: ["Announcement"]
