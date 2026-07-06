@@ -73,62 +73,67 @@ For quick and easy introduction to the latest ENCODE 4 deep learning models, we 
 
 ---
 ## Quick-start guide (5 min)
-Below, we review the basics of navigating an ENCODE model annotation page and explain how to load the most commonly used resource files into the WashU genome browser. We recommend visualizing the files as a first step in designing any larger-scale quantitative analyses.
+Below, we review the basics of navigating an ENCODE model annotation page and explain how to load the most commonly used resource files into the WashU genome browser. 
+We recommend visualizing the files as a first step in designing any larger-scale quantitative analyses.
 
 We use the example of a **ChromBPNet model trained on ATAC-seq in K562 (ENCSR868FGK)**.
 
 ### Step 1: Find the model annotation page
-Navigate to the ChromBPNet model annotation for ENCSR893SUD (ATAC in K562 cells): [https://www.encodeproject.org/annotations/ENCSR893SUD/](https://www.encodeproject.org/annotations/ENCSR893SUD/). The model annotations associated with an experiment can be found on the corresponding experiment summary page. 
+Navigate to the ChromBPNet model annotation for ENCSR893SUD (ATAC in K562 cells): [https://www.encodeproject.org/annotations/ENCSR893SUD/](https://www.encodeproject.org/annotations/ENCSR893SUD/). 
+The model annotations associated with an experiment can be found on the corresponding experiment summary page. 
 
-![Figure 1](Fig1.png "width=100% Screenshot of the ENCODE Portal for a ChromBPNet model (ENCSR893SUD).")
+![Figure 1](Fig1.png "Screenshot of the ENCODE Portal for a ChromBPNet model (ENCSR893SUD).")
 
 A list of all available annotations is also available here: [https://www.encodeproject.org/annotations/](https://www.encodeproject.org/annotations/).
 
 ### Step 2: Find the files of interest
-To browse the available files, scroll down to the middle of the page and select the “File details” tab. For any initial exploratory analysis, we recommend comparing the normalized observed signal, the predicted signal and the counts contribution scores bigWigs.
+To browse the available files, scroll down to the middle of the page and select the **“File details”** tab. 
+For any initial exploratory analysis, we recommend comparing the normalized observed signal, the predicted signal and the counts contribution scores bigWigs.
 
-![Figure 2](Fig2.png "Screenshot of the ENCODE Portal of "File details" for a ChromBPNet model (ENCSR893SUD).")
+![Figure 2](Fig2-3.png "Screenshot of the ENCODE Portal of 'File details' for a ChromBPNet model (ENCSR893SUD).")
 
-The following steps will require the URLs to these bigwigs, which can be found by right clicking the download icon: , and clicking “Copy link address”. The links are provided here for convenience:
+The following steps will require the URLs to these bigwigs, which can be found by right clicking the **download icon**, and clicking **“Copy link address”**. The links are provided here for convenience:
 
-[https://www.encodeproject.org/files/ENCFF880ZUI/@@download/ENCFF880ZUI.bigWig](https://www.encodeproject.org/files/ENCFF880ZUI/@@download/ENCFF880ZUI.bigWig)
-[https://www.encodeproject.org/files/ENCFF296ICJ/@@download/ENCFF296ICJ.bigWig](https://www.encodeproject.org/files/ENCFF296ICJ/@@download/ENCFF296ICJ.bigWig)
-[https://www.encodeproject.org/files/ENCFF407GCO/@@download/ENCFF407GCO.bigWig](https://www.encodeproject.org/files/ENCFF407GCO/@@download/ENCFF407GCO.bigWig)
+- **Normalized observed signal profile**: [https://www.encodeproject.org/files/ENCFF880ZUI/@@download/ENCFF880ZUI.bigWig](https://www.encodeproject.org/files/ENCFF880ZUI/@@download/ENCFF880ZUI.bigWig)
+- **Normalized predicted signal profile**: [https://www.encodeproject.org/files/ENCFF296ICJ/@@download/ENCFF296ICJ.bigWig](https://www.encodeproject.org/files/ENCFF296ICJ/@@download/ENCFF296ICJ.bigWig)
+- **Counts sequence contribution scores**: [https://www.encodeproject.org/files/ENCFF407GCO/@@download/ENCFF407GCO.bigWig](https://www.encodeproject.org/files/ENCFF407GCO/@@download/ENCFF407GCO.bigWig)
 
-More information regarding the various files that are available can be found in the "What's inside ChromBPNet" and "Which files to use" sections. 
+For more information regarding the various files that are available, see the [**ENCODE 4 preprint**](LINK).
 
 ### Step 3: Load the bigwigs into the WashU genome browser
-Navigate to the WashU browser page: [https://epigenomegateway.wustl.edu/browser2022/](https://epigenomegateway.wustl.edu/browser2022/). On the home page, find the “Human” section and select “hg38” to open a new browser session:
+Navigate to the WashU browser page: [https://epigenomegateway.wustl.edu/browser2022/](https://epigenomegateway.wustl.edu/browser2022/). On the home page, find the **“Human”** section and select **“hg38”** to open a new browser session:
 
 ![Figure 3](Fig3.png "Screenshot of the WashU Genome Browser: Home.")
 
-After opening a new browser session, select the “Tracks” icon at the top of the page, and then select the “Remote Tracks” button from the dropdown menu:
+After opening a new browser session, select the **“Tracks”** icon at the top of the page, and then select the **“Remote Tracks”** button from the dropdown menu:
 
 ![Figure 4](Fig4.png "Screenshot of the WashU Genome Browser: Browser (Tracks).")
 
-You should next see a window that looks like this:
+You should next see a window that looks like below:
 
 ![Figure 5](Fig5.png "Screenshot of the WashU Genome Browser: Browser (Add remote tracks).")
 
-Copy and paste each of the first two URLs from Step 2 and add a label (observed and predicted, respectively). After each one first click “Submit” at the bottom of the window:
+Copy and paste each of the first two URLs from Step 2 and add a label (e.g., observed and predicted, respectively). 
+After each one first click **“Submit”** at the bottom of the window:
 
 ![Figure 6](Fig6.png "Screenshot of the WashU Genome Browser: Browser (Add remote tracks: Submit).")
 
-Then click “Add another track”:
+Then click **“Add another track”**:
 
 ![Figure 7](Fig7.png "Screenshot of the WashU Genome Browser: Browser (Add remote tracks: Add another track).")
 
-For the third bigwig, the contribution scores, we will change the Track type to Dynseq, by clicking on the “Track type” box and scrolling to the fifth track option on the list:
+For the third bigwig, the contribution scores, we will change the Track type to **Dynseq**, by clicking on the **“Track type”** box and scrolling to the fifth track option on the list:
 
 ![Figure 8](Fig8.png "Screenshot of the WashU Genome Browser: Browser (Add remote tracks: dynseq - dynamic sequence).")
 
-This allows us to visualize the contributions of individual nucleotides in the region to the predictions of the modelled assay (zoom in for the bases to render). Small clusters of high contribution score bases typically represent transcription factor binding motifs.
+This allows us to visualize the contributions of individual nucleotides in the region to the predictions of the modelled assay (zoom in for the bases to render). 
+Small clusters of high contribution score bases typically represent transcription factor binding motifs.
 
-Add a label to this track, for example “counts contribution scores”.
+Add a label to this track: for example “counts contribution scores”.
 
-The final browser view should look something like this:
+The final browser view should look something like below:
 
-![Figure 9](Fig9.png "width=100% Screenshot of the WashU Genome Browser: Browser (With tracks).")
+![Figure 9](Fig9.png "Screenshot of the WashU Genome Browser: Browser (With tracks).")
 
 For additional information regarding how to use the WashU browser, see the documentation: [https://epigenomegateway.readthedocs.io/en/latest/usage.html](https://epigenomegateway.readthedocs.io/en/latest/usage.html).
 
