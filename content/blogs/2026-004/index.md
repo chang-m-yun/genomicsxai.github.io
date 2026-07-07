@@ -28,7 +28,7 @@ authors_display:
     affiliation: "Stanford University"
     orcid: "0000-0003-3084-2287"
 
-editor: "Alan Murphy"
+editor: ["Al-Murphy"]
 
 tags: ["genomics", "finetuning", "AlphaGenome", "seq2func", "PyTorch"]
 categories: ["Blog Post"]

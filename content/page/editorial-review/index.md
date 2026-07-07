@@ -135,6 +135,8 @@ Editors choose one:
 * **Major revisions**
 * **Not Accepted** (out of scope or insufficient quality)
 
+> **Reviewer credit is automatic.** When the PR is merged, any editor who engaged with it — through a formal review, a review comment, or a conversation comment — is added to the post's `editor:` frontmatter automatically (regardless of the outcome). You don't need to edit that field by hand; only members of the `@genomicsxai/editors` team are credited, so authors and other commenters are never added.
+
 ---
 
 ## 4. Minimal review checklist

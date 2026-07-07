@@ -18,7 +18,7 @@ authors_display:
   - name: "Sara Mostafavi"
     affiliation: "University of Washington"
 
-editor: "Genomics X AI Editors"
+editor: ["Genomics X AI Editors", "Al-Murphy"]
 
 tags: ["genomics", "AlphaGenome", "JAX", "PyTorch", "benchmarking", "GPUs", "seq2func"]
 categories: ["Blog Post"]
