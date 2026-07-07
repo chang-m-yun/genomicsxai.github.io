@@ -142,7 +142,7 @@ As part of the ENCODE Project, all data, models, analysis are shared **without r
 
 Additionally, we have tried our best to make the resource as user-friendly as possible: 
 - **Models**: We have uploaded the models for open access on [**Hugging Face**](https://huggingface.co/collections/kundajelab/encode-bpnet-models) 
-- **Model predictions, contributions and instances**: We have created a [**UCSC Track Hub**](https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&hubUrl=https://kundajelab.github.io/ucsc-trackhub-encode.github.io/hub.txt) for easy, interactive browser sessions
+- **Model predictions, contributions and instance tracks**: We have created a [**UCSC Track Hub**](https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&hubUrl=https://kundajelab.github.io/ucsc-trackhub-encode.github.io/hub.txt) for easy, interactive browser sessions
 - **User guide**: We are currently building an _interactive_ user guide to help the community navigate and explain the resource (_work in progress_)
 - **Preprint**: For more detail, the latest ENCODE preprint is out on [bioRxiv](LINK)
 
