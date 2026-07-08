@@ -32,7 +32,7 @@ authors_display:
 submitter_github: "chang-m-yun"
 
 # Add any number of tags. They're searchable on the blog homepage. See https://genomicsxai.github.io/tags/ for examples.
-tags: ["encode", "genomics", "transcription-factor", "chromatin-accessibility", "chip-seq", "dnase-seq", "atac-seq", "seq2func"]
+tags: ["encode", "genomics", "transcription-factor", "chromatin-accessibility", "ChIP-seq", "DNase-seq", "ATAC-seq", "seq2func"]
 # Category determines which homepage pill filter the post appears under.
 # Supported values: "Announcement", "Blog Post", "Tutorial", "Perspective", "Paper Reviews"
 #   - "Announcement"  → appears under the Announcements pill (editorial/community announcements)
@@ -69,6 +69,13 @@ revision_history:
 
 {{< summary >}}
 For quick and easy introduction to the latest ENCODE 4 deep learning models, we provide a **Quick-start guide** (5 min). Following the instructions, you should be able to create an **interactive genome browser session** to view a model's outputs, including experimentally observed signal, model-predictied signal, sequence contribution scores, and genomic motif instances.
+
+**Contributions**:
+- Primary contributors: Vivekanandan Ramalingam, Chang M. Yun, Vivian Hecht, Aman Patel, Anusri Pampari, Ziwei Chen, Johannes Linder, Soumya Kundu, Ivy Evergreen, Austin Wang, Daniel Kim, Eran Kotler
+- Secondary contributors: Georgi K. Marinov, Kelly Cochran, Abhimanyu Banerjee, Surag Nair, Salil S. Deshpande, Zahoor Zafrulla, Riya Sinha
+- Tertiary contributors: Alex M. Tseng, Amr Alexandari, Mahfuza Sharmin, Avanti Shrikumar, Jacob M. Schreiber, Caleb Lareau
+- Corresponding contributors: Anshul Kundaje
+- Blog post: Chang M. Yun, Vivekanandan Ramalingam, Vivian Hecht
 {{< /summary >}}
 
 ---
