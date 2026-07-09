@@ -26,6 +26,8 @@ authors_display:
     affiliation: "Stanford University"
     orcid: "0000-0003-3084-2287"
 
+editor: "Genomics X AI Editors"
+
 # Set automatically by the submission form to the GitHub login of the original
 # submitter. Used by the form to surface "Update one of my previous posts" for
 # the same account on later revisions. Safe to omit when authoring manually.
@@ -156,7 +158,7 @@ Additionally, we have tried our best to make the resource as user-friendly as po
 Lastly, we still have so much to share about the resource: we are planning to regularly share the many different ways you can use the resource (every week) for the foreseeable future, so give us a follow and be on the lookout for more!
 
 ## References
-1. The ENCODE Project Consortium et al. The Encyclopedia of DNA Elements. _bioRxiv_ (2026) ([https://doi.org/10.64898/2026.07.06.731365](https://doi.org/10.64898/2026.07.06.731365))
+1. The ENCODE Project Consortium et al. The Encyclopedia of DNA Elements. _bioRxiv_ 2026.07.06.731365 (2026) ([https://doi.org/10.64898/2026.07.06.731365](https://doi.org/10.64898/2026.07.06.731365))
 2. Li, D. et al. WashU Epigenome Browser update 2022, _Nucleic Acids Research_, Volume 50, Issue W1, (2022), Pages W774–W781. ([https://doi.org/10.1093/nar/gkac238](https://doi.org/10.1093/nar/gkac238))
 3. Avsec, Ž. et al. Base-resolution models of transcription-factor binding reveal soft motif syntax. _Nat Genet_ 53, 354—366 (2021). ([https://doi.org/10.1038/s41588-021-00782-6](https://doi.org/10.1038/s41588-021-00782-6))
 4. Pampari, A. et al. ChromBPNet: bias factorized, base-resolution deep learning models of chromatin accessibility reveal cis-regulatory sequence syntax, transcription factor footprints and regulatory variants. _bioRxiv_ 2024.12.25.630221 (2024). ([https://doi.org/10.1101/2024.12.25.630221](https://doi.org/10.1101/2024.12.25.630221))
