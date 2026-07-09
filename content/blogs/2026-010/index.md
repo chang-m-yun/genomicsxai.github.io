@@ -105,7 +105,7 @@ The following steps will require the URLs to these bigwigs, which can be found b
 - **Normalized predicted signal profile**: [https://www.encodeproject.org/files/ENCFF296ICJ/@@download/ENCFF296ICJ.bigWig](https://www.encodeproject.org/files/ENCFF296ICJ/@@download/ENCFF296ICJ.bigWig)
 - **Counts sequence contribution scores**: [https://www.encodeproject.org/files/ENCFF407GCO/@@download/ENCFF407GCO.bigWig](https://www.encodeproject.org/files/ENCFF407GCO/@@download/ENCFF407GCO.bigWig)
 
-For more information regarding the various files that are available, see the [**ENCODE 4 preprint**](LINK).
+For more information regarding the various files that are available, see the [**ENCODE 4 preprint**](https://doi.org/10.64898/2026.07.06.731365).
 
 ### Step 3: Load the bigwigs into the WashU genome browser
 Navigate to the WashU browser page: [https://epigenomegateway.wustl.edu/browser2022/](https://epigenomegateway.wustl.edu/browser2022/). On the home page, find the **“Human”** section and select **“hg38”** to open a new browser session:
@@ -151,12 +151,12 @@ Additionally, we have tried our best to make the resource as user-friendly as po
 - **Models**: We have uploaded the models for open access on [**Hugging Face**](https://huggingface.co/collections/kundajelab/encode-bpnet-models) 
 - **Model predictions, contributions and instance tracks**: We have created a [**UCSC Track Hub**](https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&hubUrl=https://kundajelab.github.io/ucsc-trackhub-encode.github.io/hub.txt) for easy, interactive browser sessions
 - **User guide**: We are currently building an _interactive_ user guide to help the community navigate and explain the resource (_work in progress_)
-- **Preprint**: For more detail, the latest ENCODE preprint is out on [bioRxiv](LINK)
+- **Preprint**: For more detail, the latest ENCODE preprint is out on [_bioRxiv_](https://doi.org/10.64898/2026.07.06.731365)
 
 Lastly, we still have so much to share about the resource: we are planning to regularly share the many different ways you can use the resource (every week) for the foreseeable future, so give us a follow and be on the lookout for more!
 
 ## References
-1. (LINK)
+1. The ENCODE Project Consortium et al. The Encyclopedia of DNA Elements. _bioRxiv_ (2026) ([https://doi.org/10.64898/2026.07.06.731365](https://doi.org/10.64898/2026.07.06.731365))
 2. Li, D. et al. WashU Epigenome Browser update 2022, _Nucleic Acids Research_, Volume 50, Issue W1, (2022), Pages W774–W781. ([https://doi.org/10.1093/nar/gkac238](https://doi.org/10.1093/nar/gkac238))
 3. Avsec, Ž. et al. Base-resolution models of transcription-factor binding reveal soft motif syntax. _Nat Genet_ 53, 354—366 (2021). ([https://doi.org/10.1038/s41588-021-00782-6](https://doi.org/10.1038/s41588-021-00782-6))
 4. Pampari, A. et al. ChromBPNet: bias factorized, base-resolution deep learning models of chromatin accessibility reveal cis-regulatory sequence syntax, transcription factor footprints and regulatory variants. _bioRxiv_ 2024.12.25.630221 (2024). ([https://doi.org/10.1101/2024.12.25.630221](https://doi.org/10.1101/2024.12.25.630221))

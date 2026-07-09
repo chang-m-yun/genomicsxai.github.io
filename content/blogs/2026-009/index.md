@@ -68,7 +68,7 @@ revision_history:
 ---
 
 {{< summary >}}
-The 4th and final phase of the [**ENCODE Project**](LINK) is released today for **free and unrestricted public use**. We trained [BPNet](https://doi.org/10.1038/s41588-021-00782-6) models on 2,339 TF-ChIP-seq across 788 TFs, [ChromBPNet](https://doi.org/10.1101/2024.12.25.630221) models on 1,512 DNase-seq and ATAC-seq across 408 samples, [ProCapNet](https://doi.org/10.1101/2024.05.28.596138) models on 6 PRO-Cap, and ReporterNet models on 5 MPRAs as part of the Project. We showcase an example of how to use the models to understand the underlying rules of regulation. We share all models, predictions, interpretation scores, discovered motifs, and genomic instances for open use. We plan to share new stories about how to use the resource over the next several weeks.
+The 4th and final phase of the [**ENCODE Project**](https://doi.org/10.64898/2026.07.06.731365) is released today for **free and unrestricted public use**. We trained [BPNet](https://doi.org/10.1038/s41588-021-00782-6) models on 2,339 TF-ChIP-seq across 788 TFs, [ChromBPNet](https://doi.org/10.1101/2024.12.25.630221) models on 1,512 DNase-seq and ATAC-seq across 408 samples, [ProCapNet](https://doi.org/10.1101/2024.05.28.596138) models on 6 PRO-Cap, and ReporterNet models on 5 MPRAs as part of the Project. We showcase an example of how to use the models to understand the underlying rules of regulation. We share all models, predictions, interpretation scores, discovered motifs, and genomic instances for open use. We plan to share new stories about how to use the resource over the next several weeks.
 
 **Contributions**:
 - Primary contributors: Vivekanandan Ramalingam, Chang M. Yun, Vivian Hecht, Aman Patel, Anusri Pampari, Ziwei Chen, Johannes Linder, Soumya Kundu, Ivy Evergreen, Austin Wang, Daniel Kim, Eran Kotler
@@ -79,14 +79,14 @@ The 4th and final phase of the [**ENCODE Project**](LINK) is released today for 
 {{< /summary >}}
 
 ---
-> _The fourth and final phase of the **[ENCODE Project](LINK)** is out..!_
+> _The fourth and final phase of the **[ENCODE Project](https://doi.org/10.64898/2026.07.06.731365)** is out..!_
 
 One of the largest projects to map all functionally active DNA elements in the human genome finally marks its final chapter.
 
 ## What is ENCODE?
 The human genome contains approximately 3.2 billion base pairs of DNA. Yet, with only around 20,000 protein-coding genes, this accounts for only 1.5% (~500 Mb) of the human genome. _So what is the role of the rest of the genome?_  
 
-The [**Encyclopedia of DNA Elements** (**ENCODE**)](https://www.encodeproject.org/) is a public research project that aims to answer this question by building a comprehensive "Encyclopedia" of all functional elements in the human genome. [ENCODE 4](LINK) is the fourth and final phase of the Project, that expands the catalog across diverse biological samples using new functional assays, including ChIP-seq across 1,100 proteins, DNase-seq across 3,425 samples, ATAC-seq across 464 samples—totaling _over 16,000 genome-wide experiments_.
+The [**Encyclopedia of DNA Elements** (**ENCODE**)](https://www.encodeproject.org/) is a public research project that aims to answer this question by building a comprehensive "Encyclopedia" of all functional elements in the human genome. [ENCODE 4](https://doi.org/10.64898/2026.07.06.731365) is the fourth and final phase of the Project, that expands the catalog across diverse biological samples using new functional assays, including ChIP-seq across 1,100 proteins, DNase-seq across 3,425 samples, ATAC-seq across 464 samples—totaling _over 16,000 genome-wide experiments_.
 
 ![Figure: ENCODE cube](ENCODE_cube.png "width=600 The ENCODE Project has collected and identified functional genomic elements (1) using 100s of functional biochemical markers, (2) in 100s of different cell type contexts, (3) across the 3 billion genomc positionce.")
 
@@ -131,12 +131,12 @@ Additionally, we have tried our best to make the resource as user-friendly as po
 - **Models**: We have uploaded the models for open access on [**Hugging Face**](https://huggingface.co/collections/kundajelab/encode-bpnet-models) 
 - **Predictions, contributions, and instances**: We have created a [**UCSC Track Hub**](https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&hubUrl=https://kundajelab.github.io/ucsc-trackhub-encode.github.io/hub.txt) for easy, interactive browser sessions
 - **User guide**: We are currently building an _interactive_ user guide to help the community navigate and explain the resource (_work in progress_)
-- **Preprint**: For more detail, the latest ENCODE preprint is out on [_bioRxiv_](LINK)
+- **Preprint**: For more detail, the latest ENCODE preprint is out on [_bioRxiv_](https://doi.org/10.64898/2026.07.06.731365)
 
 Lastly, we still have so much to share about the resource! We are planning to regularly share the many different ways you can use the resource (~every week) for the foreseeable future, so give us a follow and be on the lookout for more.
 
 ## References
-1. (LINK)
+1. The ENCODE Project Consortium et al. The Encyclopedia of DNA Elements. _bioRxiv_ (2026) ([https://doi.org/10.64898/2026.07.06.731365](https://doi.org/10.64898/2026.07.06.731365))
 2. Avsec, Ž. et al. Base-resolution models of transcription-factor binding reveal soft motif syntax. _Nat Genet_ 53, 354—366 (2021). ([https://doi.org/10.1038/s41588-021-00782-6](https://doi.org/10.1038/s41588-021-00782-6))
 3. Pampari, A. et al. ChromBPNet: bias factorized, base-resolution deep learning models of chromatin accessibility reveal cis-regulatory sequence syntax, transcription factor footprints and regulatory variants. _bioRxiv_ 2024.12.25.630221 (2024). ([https://doi.org/10.1101/2024.12.25.630221](https://doi.org/10.1101/2024.12.25.630221))
 4. Cochran, K. et al. Dissecting the cis-regulatory syntax of transcription initiation with deep learning. _bioRxiv_ 2024.05.28.596138 (2024). ([https://doi.org/10.1101/2024.05.28.596138](https://doi.org/10.1101/2024.05.28.596138))
