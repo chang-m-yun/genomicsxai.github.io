@@ -81,44 +81,37 @@ The 4th and final phase of the [**ENCODE Project**](https://doi.org/10.64898/202
 {{< /summary >}}
 
 ---
-> _The fourth and final phase of the **[ENCODE Project](https://doi.org/10.64898/2026.07.06.731365)** is out..!_
-
-One of the largest projects to map all functionally active DNA elements in the human genome finally marks its final chapter.
-
-## What is ENCODE?
-The human genome contains approximately 3.2 billion base pairs of DNA. Yet, with only around 20,000 protein-coding genes, this accounts for only 1.5% (~500 Mb) of the human genome. _So what is the role of the rest of the genome?_  
-
-The [**Encyclopedia of DNA Elements** (**ENCODE**)](https://www.encodeproject.org/) is a public research project that aims to answer this question by building a comprehensive "Encyclopedia" of all functional elements in the human genome. [ENCODE 4](https://doi.org/10.64898/2026.07.06.731365) is the fourth and final phase of the Project, that expands the catalog across diverse biological samples using new functional assays, including ChIP-seq across 1,100 proteins, DNase-seq across 3,425 samples, ATAC-seq across 464 samples—totaling _over 16,000 genome-wide experiments_.
+## ENCODE: Encyclopedia of DNA Elements
+The human genome contains approximately 3.2 billion base pairs of DNA. Yet, with only around 20,000 protein-coding genes, this accounts for only 1.5% (~500 Mb) of the human genome. The remaining, non-coding portion contains a vast array of functional and regulatory elements that control gene expression. The [**Encyclopedia of DNA Elements** (**ENCODE**)](https://www.encodeproject.org/) is a public research project dedicated to building a comprehensive "Encyclopedia" of all of these elements. [ENCODE 4](https://www.biorxiv.org/content/10.64898/2026.07.06.731365v1) is the fourth and final phase of the project, expanding the catalog across diverse biological samples and new functional assays, including ChIP-seq across 1,100 proteins, DNase-seq across 3,425 samples, ATAC-seq across 464 samples—totaling _over 16,000 genome-wide experiments_.
 
 ![Figure: ENCODE cube](ENCODE_cube.png "width=600 The ENCODE Project has collected and identified functional genomic elements (1) using 100s of functional biochemical markers, (2) in 100s of different cell type contexts, (3) across the 3 billion genomc positionce.")
+_Roadmap Epigenomics Consortium et al. Integrative analysis of 111 reference human epigenomes. Nature 518, 317–330 (2015). ([https://doi.org/10.1038/nature14248](https://doi.org/10.1038/nature14248))_
 
 ## An 'Encyclopedia' of regulatory DNA deep learning models
-As computational biologists, we believe that the value of such a dataset comes best when combined with _deep learning models_, that really help **squeeze every drop of signal** from the data.
+In previous work, we have shown how deep learning models can be used to understand how sets of transcription factor binding motifs can be composed together in a form of regulatory syntax, similarly to how we construct a sentence out of words corresponding to different parts of speech. Moreover, we can use our models to make predictions about how individual non-coding variants can disrupt transcription factor binding, furthering our understanding of mechanisms of disease. The richness of the ENCODE dataset enables us to explore these topics and more in a wide variety of tissues and cell types. By providing our models and analyses to the community at large, we hope to empower others to do so as well.
 
 Using the latest ENCODE data, we trained [BPNet](https://doi.org/10.1038/s41588-021-00782-6) models on 2,339 TF-ChIP-seq across 788 TFs, [ChromBPNet](https://doi.org/10.1101/2024.12.25.630221) models on 1,512 DNase-seq and ATAC-seq across 408 biosamples, [ProCapNet](https://doi.org/10.1101/2024.05.28.596138) models on 6 PRO-Cap, and ReporterNet models on 5 MPRAs to capture the dynamic regulatory activity across diverse samples.
 
-With the models—as we have shown in prior work—we are able to make predictions for unseen sequence, identify the key underlying sequence drivers, and map the binding instances across the genome—which we have processed for **all 3,851 models** to provide as part of the ENCODE resource. 
-
-We believe the models and outputs will be a valuable resource to the community. We share one example of how to use the resource:
+In the following section, we share one example of how to use the resource.
 
 ## Understanding regulation through the lens of deep learning models
 Below, we view an example genomic region—a _CRISPRi-validated_ distal enhancer in the MYC locus [chr8:127,898,412—127,899,647]—through the lens of **15 different models**.
 
 ![Figure 1](MYC_fig1.png "width=600 Deep learning model-derived browser tracks at a CRISPRi-validated distal enhancer at the MYC locus in K562 (chr8:127,898,412—127,899,647; ~162 kb downstream of the MYC promoter). From top to bottom: observed DNase-seq and ATAC-seq profiles, model predicted DNase-seq and ATAC-seq profiles at base-resolution (ChromBPNet), bias-corrected predictions at base-resolution, and sequence contribution maps. Insets compare contribution maps across DNase/ATAC (ChromBPNet), MPRA (ReporterNet), and TF ChIP-seq models (BPNet; e.g., GATA2, SP1, CEBPB, JUND, GABPB1), with high-impact motif instances annotated (e.g., GATA, SP, AP-1, ETV/ETS, CEBP). The same is repeated in HepG2.")
 
-First, examining chromatin accessiblity through ChromBPNet models: as expected, the models **recapitulate the observed experimental profile** with high concordance. Further, the models can **de-noise** the profile to isolate the true underlying accessibility signal, aligning two alternative experimental methods (DNase-seq, ATAC-seq) into agreement (where raw signals can diverge due to enzyme differences).
+First, examining chromatin accessibility through ChromBPNet models: the models recapitulate the observed experimental profile with high concordance. Further, the models can de-noise the profile to isolate the true underlying accessibility signal, reconciling DNase and ATAC-seq experimental methods (DNase-seq, ATAC-seq) into agreement (where raw signals can diverge due to enzyme differences).
 
 ![Figure 2](MYC_fig2.png "width=600 Observed, model-predicted, and model-corrected DNase-seq and ATAC-seq profiles by ChromBPNet.")
 
 Second, using the models, we highlight the key sequence drivers that the models identified to make its predictions (as "contribution scores"), and begin to see the underlying biological mechanism of regulation at this locus:
 
-Examining the highly contributing sequences for chromatin accessibility through ChromBPNet, we observe **key transcription factors** (e.g., GATA, AP1, SP, ETV) that drive accessibility—in agreement with prior understanding.
+Examining the highly contributing sequences for chromatin accessibility through ChromBPNet, we observe key transcription factors (e.g., GATA, AP1, SP, ETV) that drive accessibility—in agreement with prior understanding.
 
-In parallel, examining the key sequences for TF binding through BPNet, we observe the **same sequences** predict TF binding, in agreement with ChromBPNet—despite being trained on two **entirely orthogonal assay types** (TF ChIP-seq vs. DNase-seq/ATAC-seq).
+In parallel, examining the key sequences for TF binding through BPNet, we observe the same sequences predict TF binding, in agreement with ChromBPNet—despite being trained on two entirely orthogonal assay types (TF ChIP-seq vs. DNase-seq/ATAC-seq).
 
 ![Figure 3](MYC_fig3.png "width=600 Highly contributing sequences used by the models during prediction. Insets compare contribution maps across DNase/ATAC (ChromBPNet), MPRA (ReporterNet), and TF ChIP-seq models (BPNet; e.g., GATA2, SP1, CEBPB, JUND, GABPB1), with high-impact motif instances annotated (e.g., GATA, SP, AP-1, ETV/ETS, CEBP).")
 
-Finally, we can repeat the analysis for **HepG2** (also showing high concordance and known sequence motifs), and compare the highly contributing sequences between K562 vs. HepG2: we see some agreement (e.g., AP1, SP, ETV), but also some that **disappear** (e.g., GATA), while others that **newly appear** (e.g., FOX) in HepG2—showcasing the cell type variation of this enhancer.
+Finally, we can repeat the analysis for HepG2 (also showing high concordance and known sequence motifs), and compare the highly contributing sequences between K562 vs. HepG2: we see some agreement (e.g., AP1, SP, ETV), but also some that disappear (e.g., GATA), while others that newly appear (e.g., FOX) in HepG2—showcasing the cell type variation of this enhancer.
 
 ![Figure 4](MYC_fig4.png "width=600 Comparing highly contributing sequences used by the model trained on K562 vs. HepG2.")
 
