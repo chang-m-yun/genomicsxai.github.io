@@ -94,6 +94,18 @@ False positives are usually obvious (the word `onclick` inside a fenced code blo
 
 Until the site moves the OAuth token to an HttpOnly cookie or adopts a strict CSP, this check is the only thing standing between a malicious submission and every signed-in reader's GitHub account.
 
+### H. References and Google Scholar indexing
+
+* A **References section** is present at the end of the post
+* References are **numbered** and cite the primary literature, with a **DOI or publisher link** per entry wherever one exists
+* Inline links to blog posts, repos, or docs are welcome, but they do **not** substitute for a bibliography of the papers the work builds on
+
+**Why this matters:** every accepted post emits Google Scholar (Highwire) metadata and gets a Zenodo DOI, so posts are eligible to appear in Google Scholar. But Scholar does not index everything it can crawl — it only includes documents its parser classifies as *scholarly articles*, and a reference list is a primary signal it uses to tell a research article apart from an ordinary web page.
+
+To be clear, this is **an observation, not a documented rule** — we cannot see Google's classifier. What we have noticed is that, of our accepted posts, the ones carrying a substantial DOI-linked bibliography were picked up by Scholar, while posts with no references (or a single unlinked one) were not, even when they were long, older, and otherwise well-formed. Post length and publication date did not predict inclusion; the reference list did.
+
+**Decision rule:** treat a missing or token References section as a change request, not a blocker. Ask the author to add the papers the post already builds on. A post can still be accepted without one — it will simply be much less likely to surface in Scholar.
+
 ---
 
 ## 2. Executive summary requirement
@@ -157,6 +169,7 @@ Editors choose one:
 * [ ] Clear takeaway or value
 * [ ] Appropriate level for audience
 * [ ] References and links included where needed
+* [ ] **References section present**, numbered, with DOI/publisher links — needed for the post to appear in Google Scholar (see [§1H](#h-references-and-google-scholar-indexing))
 * [ ] Formatting clean
 
 ---
