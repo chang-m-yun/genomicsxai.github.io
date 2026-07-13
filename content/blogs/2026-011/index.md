@@ -22,7 +22,7 @@ authors_display:
     affiliation: "UMass Chan Medical School, Department of Genomics and Computational Biology"
     orcid: ""
 
-editor: "Editor Name"
+editor: ""
 
 # Set automatically by the submission form to the GitHub login of the original
 # submitter. Used by the form to surface "Update one of my previous posts" for
@@ -30,7 +30,7 @@ editor: "Editor Name"
 # submitter_github: "your-github-login"
 
 # Add any number of tags. They're searchable on the blog homepage. See https://genomicsxai.github.io/tags/ for examples.
-tags: ["genomics", "cherimoya", "DNA design"]
+tags: ["genomics", "cherimoya", "DNA design","seq2func"]
 # Category determines which homepage pill filter the post appears under.
 # Supported values: "Announcement", "Blog Post", "Tutorial", "Perspective", "Paper Reviews"
 #   - "Announcement"  → appears under the Announcements pill (editorial/community announcements)
@@ -50,7 +50,7 @@ labs: ["Programmable Genomics Laboratory"]
 status: "submitted"
 revision: 1
 
-date_submitted: 2026-02-19
+date_submitted: 2026-07-13
 date_accepted: 
 date: 2026-02-19
 
@@ -67,7 +67,15 @@ revision_history:
 
 {{< summary >}}
 
-Include a high-level summary of your post here. Alternatively editors can write a summary of the post if requested.
+Cherimoya is a lightweight sequence-to-function (S2F) model for chromatin accessibility, adapting the [Chrom/BPNet](https://doi.org/10.1101/2024.12.25.630221) architecture into a far smaller and faster model through a redesigned convolutional block and custom GPU kernels. At 614K parameters (under 10% of ChromBPNet), it is small and fast enough to make the millions of forward passes that variant scoring, interpretation, and sequence design demand a practical proposition, rather than optimising for benchmark scores alone.
+
+Three things stand out:
+
+- **Smaller and better.** Despite the tiny parameter count, Cherimoya beats ChromBPNet on both accessibility and variant effect prediction, and closes over half the gap to massive generalist models like Borzoi and AlphaGenome on counts prediction.
+- **Fast enough to change what is feasible.** Custom GPU kernels make it roughly 6x faster than ChromBPNet at inference, and a single model trains in about 10 minutes on genome-wide data. Running ISM on CPU is faster than running Borzoi on a GPU.
+- **Usable without code.** Command-line tools and agentic skills take you from raw reads to trained models, attributions, and motif calls without writing a line of Python.
+
+**Code**: [cherimoya](https://github.com/jmschrei/cherimoya)
 
 {{< /summary >}}
 
@@ -229,7 +237,7 @@ The Cherimoya repository comes with built-in skills that use progressive disclos
 
 Cherimoya is a lightweight S2F model that achieves strong performance despite its small parameter count. We have adopted it internally in the [Programmable Genomics Laboratory](https://programmable-genomics.github.io/) across a range of projects, and plan to continue expanding its scope, performance, and capabilities. To write like an AI: this is not just a one-off project; it’s a foundation for future work in the lab. As we scale up our design work from a small number of cell lines to targeting every cell type in a complex mammalian organ, such as the brain, lightweight models that can run quickly and fit easily in GPU memory are crucial.
 
-*Cherimoya is from Christian Ramirez, Achsah Marlene Aruva, and Jacob Schreiber (UMass Chan Medical School). Model and CLI code live in the `cherimoya` repo; analysis tooling builds on `tangermeme`. Work is still in progress, and the final numbers and results will likely differ slightly from this blog post. Thanks to Anthropic for providing credits through their AI for Science program.*
+*Cherimoya is from Christian Ramirez, Achsah Marlene Aruva, and Jacob Schreiber (UMass Chan Medical School). Model and CLI code live in the [`cherimoya` repo](https://github.com/jmschrei/cherimoya); analysis tooling builds on `tangermeme`. Work is still in progress, and the final numbers and results will likely differ slightly from this blog post. Thanks to Anthropic for providing credits through their AI for Science program.*
 
 ...  
 
