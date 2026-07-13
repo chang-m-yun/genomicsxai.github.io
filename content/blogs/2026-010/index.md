@@ -70,7 +70,7 @@ revision_history:
 ---
 
 {{< summary >}}
-For quick and easy introduction to the latest ENCODE 4 deep learning models, we provide a **Quick-start guide** (5 min). Following the instructions, you should be able to create an **interactive genome browser session** to view a model's outputs, including experimentally observed signal, model-predictied signal, sequence contribution scores, and genomic motif instances.
+For quick and easy introduction to the latest ENCODE 4 deep learning models, we provide a **Quick-start guide** (5 min). Following the instructions, you should be able to create an **interactive genome browser session** to view a model's outputs, including experimentally observed signal, model-predicted signal, sequence contribution scores, and genomic motif instances.
 
 **Contributions**:
 - Primary contributors: Vivekanandan Ramalingam, Chang M. Yun, Vivian Hecht, Aman Patel, Anusri Pampari, Ziwei Chen, Johannes Linder, Soumya Kundu, Ivy Evergreen, Austin Wang, Daniel Kim, Eran Kotler
@@ -85,7 +85,7 @@ For quick and easy introduction to the latest ENCODE 4 deep learning models, we 
 Below, we review the basics of navigating an ENCODE model annotation page and explain how to load the most commonly used resource files into the WashU genome browser. 
 We recommend visualizing the files as a first step in designing any larger-scale quantitative analyses.
 
-We use the example of a **ChromBPNet model trained on ATAC-seq in K562 (ENCSR868FGK)**.
+We use the example of a **ChromBPNet model trained on ATAC-seq in K562 (ENCSR893SUD)**.
 
 ### Step 1: Find the model annotation page
 Navigate to the ChromBPNet model annotation for ENCSR893SUD (ATAC in K562 cells): [https://www.encodeproject.org/annotations/ENCSR893SUD/](https://www.encodeproject.org/annotations/ENCSR893SUD/). 
