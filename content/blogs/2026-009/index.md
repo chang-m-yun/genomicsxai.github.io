@@ -70,10 +70,11 @@ revision_history:
 ---
 
 {{< summary >}}
-The 4th and final phase of the [**ENCODE Project**](https://doi.org/10.64898/2026.07.06.731365) is released today for **free and unrestricted public use**. As part of the Project, we trained [BPNet](https://doi.org/10.1038/s41588-021-00782-6) models on 2,339 TF-ChIP-seq across 788 TFs, [ChromBPNet](https://doi.org/10.1101/2024.12.25.630221) models on 1,512 DNase-seq and ATAC-seq across 408 samples, [ProCapNet](https://doi.org/10.1101/2024.05.28.596138) models on 6 PRO-Cap across 6 samples, and ReporterNet models on 8 MPRAs. We showcase an example of how to use the models to understand the underlying rules of regulation. We share all models, predictions, interpretation scores, discovered motifs, and genomic instances for open use. We plan to share new stories about how to use the resource over the next several weeks.
+The 4th and final phase of the [**ENCODE Project**](https://doi.org/10.64898/2026.07.06.731365) is released today for **unrestricted public use**. As part of the Project, we trained [BPNet](https://doi.org/10.1038/s41588-021-00782-6) models on 2,339 TF-ChIP-seq across 788 TFs, [ChromBPNet](https://doi.org/10.1101/2024.12.25.630221) models on 1,512 DNase-seq and ATAC-seq across 408 samples, [ProCapNet](https://doi.org/10.1101/2024.05.28.596138) models on 6 PRO-Cap across 6 samples, and ReporterNet models on 8 MPRAs. We showcase an example of how to use the models to understand the underlying rules of regulation. We share all models, predictions, interpretation scores, discovered motifs, and genomic instances for open use. We plan to share new stories about how to use the resource over the next several weeks.
 
 **Contributions**:
-- Primary contributors: Vivekanandan Ramalingam, Chang M. Yun, Vivian Hecht, Aman Patel, Anusri Pampari, Ziwei Chen, Johannes Linder- Secondary contributors: Georgi K. Marinov, Kelly Cochran, Abhimanyu Banerjee, Surag Nair, Salil S. Deshpande, Zahoor Zafrulla
+- Primary contributors: Vivekanandan Ramalingam, Chang M. Yun, Vivian Hecht, Aman Patel, Anusri Pampari, Ziwei Chen, Johannes Linder
+- Secondary contributors: Georgi K. Marinov, Kelly Cochran, Abhimanyu Banerjee, Surag Nair, Salil S. Deshpande, Zahoor Zafrulla
 - Tertiary contributors: Alex M. Tseng, Amr Alexandari, Mahfuza Sharmin, Avanti Shrikumar, Jacob M. Schreiber, Caleb Lareau
 - Corresponding contributors: Anshul Kundaje
 - Blog post: Chang M. Yun, Vivekanandan Ramalingam, Vivian Hecht
