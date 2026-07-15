@@ -133,11 +133,11 @@
   },
   "2026-007": {
     "conceptrecid": "20840269",
-    "current_revision": 1,
-    "current_doi": "10.5281/zenodo.20840270",
-    "current_doi_url": "https://doi.org/10.5281/zenodo.20840270",
-    "current_zenodo_url": "https://zenodo.org/records/20840270",
-    "current_deposition_id": 20840270,
+    "current_revision": 2,
+    "current_doi": "10.5281/zenodo.21383205",
+    "current_doi_url": "https://doi.org/10.5281/zenodo.21383205",
+    "current_zenodo_url": "https://zenodo.org/records/21383205",
+    "current_deposition_id": 21383205,
     "revisions": {
       "1": {
         "doi": "10.5281/zenodo.20840270",
@@ -147,6 +147,15 @@
         "record_id": 20840270,
         "date": "2026-05-21",
         "notes": "Initial submission"
+      },
+      "2": {
+        "doi": "10.5281/zenodo.21383205",
+        "doi_url": "https://doi.org/10.5281/zenodo.21383205",
+        "zenodo_url": "https://zenodo.org/records/21383205",
+        "deposition_id": 21383205,
+        "record_id": 21383205,
+        "date": "2026-07-15",
+        "notes": "Corrected Enformer CRISPRi readout: the cropped model output was indexed with an input-coordinate bin without subtracting the 320-bin (40,960 bp) crop, so the CAGE readout landed ~41 kb off the TSS on background signal. Fix reads the promoter bin. Updates Enformer's correlations and the four figures containing Enformer; Borzoi, NTv3, and AlphaGenome numbers are unchanged."
       }
     }
   },
