@@ -22,7 +22,7 @@ authors_display:
     affiliation: "UMass Chan Medical School, Department of Genomics and Computational Biology"
     orcid: ""
 
-editor: ""
+editor: ["Al-Murphy"]
 
 # Set automatically by the submission form to the GitHub login of the original
 # submitter. Used by the form to surface "Update one of my previous posts" for
