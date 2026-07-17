@@ -20,7 +20,7 @@ authors_display:
   - name: "Luca Pinello"
     affiliation: "Harvard Medical School, Massachusetts General Hospital, and the Broad Institute"
     orcid: "0000-0003-1109-3823"
-editor: ""
+editor: ["Al-Murphy"]
 tags: ["genomics", "seq2func", "variant-interpretation", "foundation-models", "AlphaGenome", "MCP", "agentic-AI"]
 categories: ["Blog Post"]
 scope: ["insights", "tutorials"]
