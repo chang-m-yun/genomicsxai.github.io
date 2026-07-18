@@ -1,6 +1,6 @@
 ---
 post_id: "2026-009"
-title: "ENCODE Deep Learning Collection: A collection of regulatory deep learning models trained across ENCODE"
+title: "De-coding ENCODE: Understanding regulatory DNA through Deep learning models"
 
 # Optional: image filename "your-image.png" in the same folder
 image: "encode_logo.png"
@@ -70,7 +70,7 @@ revision_history:
 ---
 
 {{< summary >}}
-The 4th and final phase of the [**ENCODE Project**](https://doi.org/10.64898/2026.07.06.731365) is released today for **unrestricted public use**. As part of the Project, we trained [BPNet](https://doi.org/10.1038/s41588-021-00782-6) models on 2,339 TF-ChIP-seq across 788 TFs, [ChromBPNet](https://doi.org/10.1101/2024.12.25.630221) models on 1,512 DNase-seq and ATAC-seq across 408 samples, [ProCapNet](https://doi.org/10.1101/2024.05.28.596138) models on 6 PRO-Cap across 6 samples, and ReporterNet models on 8 MPRAs. We showcase an example of how to use the models to understand the underlying rules of regulation. We share all models, predictions, interpretation scores, discovered motifs, and genomic instances for open use. We plan to share new stories about how to use the resource over the next several weeks.
+The Encyclopedia of DNA Elements (ENCODE) provides a reference map of the genomic basis of gene regulation and represents more than two decades of systematic investigation into genome function, as described in our recently submitted manuscript on the final phase of the [**ENCODE Project**](https://doi.org/10.64898/2026.07.06.731365). As part of the project, we trained BPNet models on 2,339 TF-ChIP-seq across 788 TFs; ChromBPNet models on 1,512 DNase-seq and ATAC-seq across 408 samples; ProCapNet models on six PRO-Cap across 6 samples; and ReporterNet models on three lenti-MPRA experiments, one ATAC-STARR experiment, one WG-STARR experiment, and three sets of aggregated MPRA experiments. All models, predictions, interpretation scores, discovered motifs, and genomic instances are openly available for reuse. Here, we present an example of how these models can be used to uncover the underlying rules of gene regulation. Over the next several weeks, we will share additional articles highlighting other exciting ways to use this resource.
 
 **Contributions**:
 - Primary contributors: Vivekanandan Ramalingam, Chang M. Yun, Vivian Hecht, Aman Patel, Anusri Pampari, Ziwei Chen, Johannes Linder
@@ -80,42 +80,70 @@ The 4th and final phase of the [**ENCODE Project**](https://doi.org/10.64898/202
 - Blog post: Chang M. Yun, Vivekanandan Ramalingam, Vivian Hecht
 {{< /summary >}}
 
----
-## ENCODE: Encyclopedia of DNA Elements
-The human genome contains approximately 3.2 billion base pairs of DNA. Yet, with only around 20,000 protein-coding genes, this accounts for only 1-2% (~50 Mb) of the human genome. The remaining, non-coding portion contains a sea of functional and regulatory elements that control gene expression. The [**Encyclopedia of DNA Elements** (**ENCODE**)](https://www.encodeproject.org/) is a public research project dedicated to building a comprehensive "Encyclopedia" of all of these elements. [ENCODE 4](https://www.biorxiv.org/content/10.64898/2026.07.06.731365v1) is the fourth and final phase of the project, expanding the catalog across diverse biological samples and new functional assays, including ChIP-seq across 1,100 proteins, DNase-seq across 3,425 samples, ATAC-seq across 464 samples—totaling _over 16,000 genome-wide experiments_.
+> This post is the first of a series of blogs we will be releasing on the “ENCODE Deep Learning Collection”. We plan to release the following posts (with subject to some changes):
+> 1. Overview: What is the ENCODE Deep Learning Collection?
+> 2. Quickstart guide (5 min): How to access the ENCODE Deep Learning Collection
+> 3. Understanding regulatory DNA using deep learning models
+> 4. BPNet: A guide to modeling TF binding
+> 5. ChromBPNet: A guide to modeling chromatin accessibility
+> 6. ProCapNet: A guide to modeling transcription initiation
+> 7. ReporterNet: A guide to modeling high-throughput reporter assays
+> 8. Case study #1: Uncovering regulation in the MYC locus
+> 9. Case study #2: Predicting the effects of non-coding variant mutations
+> 10. Case study #3: MotifCompendium: A unified lexicon of regulatory sequence elements
+> Follow us for an exciting journey on how to use deep learning models in regulatory genomics!
 
+## DNA: Not just genes
+The human genome contains approximately 3.2 billion base pairs of DNA. While we often think of genes that code for proteins as the primary component of DNA, they account for only 1-2% of the genome. Gene expression–the process by which genes are converted into functional products–is a highly regulated process. Genes are expressed at varying rates, and sometimes not at all–that is fundamental to the function of all living things. Many portions of the 98% of DNA not containing genes, also known as non-coding DNA, play a major role in regulating gene expression, as do the higher-order organization of DNA and various proteins that bind to it. 
+
+DNA is organized into a secondary structure called chromatin, which includes structural proteins as well as transcription factors (TFs), or proteins that bind to DNA to up- or down-regulate gene expression. Similarly to thread wound around a spool, not all chromatin is accessible at all times, and binding of various TFs both influences and is determined by chromatin accessibility. Several experimental methods have been developed to characterize transcription factor binding, chromatin accessibility and transcription initiation, or how the process of gene expression begins:
+
+**TF ChIP-seq**, or TF chromatin immunoprecipitation, is used to identify TF binding sites, one TF at a time, by using antibodies to bind a given TF that is, in turn, bound to particular regions of DNA. These bound regions are then isolated and sequenced, with reads accumulating at TF binding sites. TF-ChIP-seq datasets are typically analyzed to identify peaks from these accumulated reads.
+
+![Figure: TF ChIP-seq](TFChip.gif "width=600 Illustration of TF ChIP-seq: (1) TF binds to accessible DNA; (2) DNA is broken into fragments; (3) Antibodies bind to TF-DNA complex; (4) TF-DNA complex is pulled down; (5) Isolated DNA is cleaned and sequenced; (6) Sequences accumulate around the TF binding site.")
+
+In **DNase-seq** and **ATAC-seq**, DNA-digesting enzymes (DNase I and Tn5 transposase respectively) cut accessible chromatin into small fragments. These fragments are then isolated and sequenced, and accumulate in regions of open chromatin, analogously to TF-ChIP-seq. Worth noting is that DNase I and Tn5 transposase bind to specific DNA sequences, in addition to in open chromatin, leading to a slight bias in the form of an increased number of reads to particular regions. We discuss this further in subsequent sections.
+
+![Figure: DNase-seq, ATAC-seq](ChromatinAccessibility.gif "width=600 Illustration of DNase-seq, ATAC-seq: (1) DNA can wrap around histones ('closed') or remain unwound ('open'); (2) Enzymes (DNase I or Tn5 transposase) cut accessible DNA; (3) DNA fragments are sequenced; (4) Accessible regions appear as peaks.")
+
+In addition to chromatin accessibility and transcription factor binding, gene expression is further regulated in the moments preceding transcription. **PRO-cap** uses a process of DNA-tagging and capture to determine the position of RNA polymerase II (Pol II), a protein which transcribes DNA to RNA transcription initiation. Accumulating Pol II indicates positions of transcriptional regulation, and these can be detected via accumulation of PRO-cap reads at particular genomic locations.
+ 
+And **MPRAs** and related high throughput reporter assays are used to experimentally measure whether particular sequences are in fact responsible for regulating gene expression. In general, a candidate regulatory element, or ccRE, is inserted into a short sequence which also includes a measurable reporter output, such as a fluorescent molecule. The greater the level of the measured reporter, the more active the regulatory element.
+ 
+## ENCODE: An Encyclopedia of DNA Elements
+ 
+The [**Encyclopedia of DNA Elements**] (**ENCODE**)](https://www.encodeproject.org/) is a research consortium dedicated to building a comprehensive "Encyclopedia" of genome-wide regulatory elements. ENCODE provides a set of approximately 16,000 standardized, uniformly processed datasets for the assays described above and many others, across a wide range of cell lines, primary cells and tissues. These are organized and publicly available for download via the [ENCODE portal](https://encodeproject.org). The consortium recently released a preprint describing the newly included datasets in the fourth and final phase of the project [ENCODE 4](https://www.biorxiv.org/content/10.64898/2026.07.06.731365v1).
+ 
 ![Figure: ENCODE cube](ENCODE_cube.png "width=600 Coverage of the ENCODE Project: 100s of biochemical markers, performed in 100s of cell types and tissues, measured across 3 billion genomic positions. From Roadmap Epigenomics Consortium et al. Integrative analysis of 111 reference human epigenomes. Nature 518, 317–330 (2015). (https://doi.org/10.1038/nature14248)")
-Coverage of the ENCODE Project: 100s of biochemical markers, performed in 100s of cell types and tissues, measured across 3 billion genomic positions. From _Roadmap Epigenomics Consortium et al. Integrative analysis of 111 reference human epigenomes. Nature 518, 317–330 (2015). ([https://doi.org/10.1038/nature14248](https://doi.org/10.1038/nature14248))_
-
-## An 'Encyclopedia' of regulatory DNA deep learning models
-In prior work, we have shown that deep learning models can learn and predict the effects of DNA sequence on different modalities of regulation—learning the different "languages" of regulation. In particular, we developed 4 such types of models:
-- **BPNet:** A convolutional neural network (CNN)-style model that predicts the binding of a TF from DNA sequence, by training on TF ChIP-seq assay signal
-- **ChromBPNet:** A BPNet-style model that predicts enzyme bias-free chromatin accessibility from DNA sequence, by training on DNase-seq or ATAC-seq assay signal
-- **ProCapNet:** A BPNet-style model that predicts transcription initiation from DNA sequence, by training on PRO-cap, CAGE, and RAMPAGE assay signal
-- **ReporterNet:** A BPNet-style model that predicts large-scale reporter assay signal from DNA sequence, by training on MPRA-style assay signal
-
-Together, the "BPNet family" of models can be used to understand which DNA sequences are important for each type of regulation, quantify the effects of sequences and their interactions with each other, and generally make predictions about how changes in genotype can affect regulation—furthering our understanding of fundamental cellular regulation and disease. 
-
+Coverage of the ENCODE Project: hundreds of biochemical markers, performed in hundreds of cell types and tissues, measured across 3 billion genomic positions. From _Roadmap Epigenomics Consortium et al. Integrative analysis of 111 reference human epigenomes. Nature 518, 317–330 (2015). ([https://doi.org/10.1038/nature14248](https://doi.org/10.1038/nature14248))_
+ 
+## Decoding ENCODE: An 'Encyclopedia' of regulatory DNA deep learning models
+Experimental data describing chromatin accessibility, transcription factor binding and transcription initiation are essential to understanding the landscape of gene regulation, but do not provide a complete picture. For example, if we see a peak in ATAC-seq, we know that region is accessible, but what about the transcription factors that bind in that region and likely control that accessibility? Our group has developed deep learning models, which can learn and predict the effects of DNA sequence on different types of regulation of gene expression. They include:
+- **BPNet:** A convolutional neural network (CNN) trained on TF-ChIP-seq that predicts the binding of a TF from DNA sequence;
+- **ChromBPNet:** A CNN with a BPNet-like architecture trained on DNase- or ATAC-seq that predicts chromatin accessibility from DNA sequence and corrects for enzymatic bias;
+- **ProCapNet:** A CNN with a BPNet-like architecture trained on ProCAP-seq that predicts transcription initiation from DNA sequence;
+- **ReporterNet:** A CNN with a BPNet-like architecture trained on MPRA data that predicts large-scale reporter assay signal from DNA sequence.
+ 
+Using the "BPNet family" of models and downstream interpretation tools, we can identify the DNA sequences driving the signals in each of these assays; understand how these sequences affect accessibility individually and cooperatively; and make mechanistic predictions about disease-causing variants in regulatory regions. 
+ 
 ![Figure: ChromBPNet model architecture](ChromBPNet.png "width=600 Example BPNet-style model architecture with bias-correction: ChromBPNet. From Pampari, A. et al. ChromBPNet: bias factorized, base-resolution deep learning models of chromatin accessibility reveal cis-regulatory sequence syntax, transcription factor footprints and regulatory variants. 2024.12.25.630221 Preprint at https://doi.org/10.1101/2024.12.25.630221 (2024).")
 Example BPNet-style model architecture with bias-correction: ChromBPNet. From _Pampari, A. et al. ChromBPNet: bias factorized, base-resolution deep learning models of chromatin accessibility reveal cis-regulatory sequence syntax, transcription factor footprints and regulatory variants. _bioRxiv_ 2024.12.25.630221 (2024). ([https://doi.org/10.1101/2024.12.25.630221](https://doi.org/10.1101/2024.12.25.630221))_
-
-However, one limitation of the models is that they can only capture the effect of DNA within its trained cellular context. They cannot, for example, predict the effect of a mutation in an unseen cell type. Hence, the practical use of the model is limited if there is no model for the particular cellular context-of-interest.
-
-Here in this work, we extend our models at an unprecedented scale to cover 1,000s of cellular contexts, making the models practically useful in a broader range of use cases. We trained [BPNet](https://doi.org/10.1038/s41588-021-00782-6) models on 2,339 TF-ChIP-seq across 788 TFs, [ChromBPNet](https://doi.org/10.1101/2024.12.25.630221) models on 1,512 DNase-seq and ATAC-seq across 408 biosamples, [ProCapNet](https://doi.org/10.1101/2024.05.28.596138) models on 6 PRO-Cap, and ReporterNet models on 8 MPRAs to capture the dynamic regulatory activity across diverse samples. We release them together with the fourth and final phase of the ENCODE Project. 
-
-The richness of the ENCODE dataset enables us to explore these topics and more in a wide variety of tissues and cell types. By providing our models and analyses to the community at large, we hope to empower others to do so as well.
-
+ 
+In the ENCODE Deep learning collections (De-ENCODE), we train these models on hundreds of cell and tissue types available through the ENCODE consortium. We trained [BPNet](https://doi.org/10.1038/s41588-021-00782-6) models on 2,339 TF-ChIP-seq across 788 TFs, [ChromBPNet](https://doi.org/10.1101/2024.12.25.630221) models on 1,512 DNase-seq and ATAC-seq across 408 biosamples, [ProCapNet](https://doi.org/10.1101/2024.05.28.596138) models on 6 PRO-Cap, and ReporterNet models on 8 MPRAs to capture the dynamic regulatory activity across diverse samples. We release them together with the fourth and final phase of the ENCODE Project.
+ 
+Through the power of the models and the richness of the ENCODE dataset, we hope to empower the community at large to explore important questions relating to the fundamental biology of gene regulation and mechanisms of disease in a wide variety of tissues and cell types. 
+ 
 In the following section, we share one example of how to use the resource.
-
+ 
 ## Understanding regulation through the lens of deep learning models
-Below, we view an example genomic region—a _CRISPRi-validated_ distal enhancer in the MYC locus [chr8:127,898,412—127,899,647]—through the lens of **15 different models**.
-
+The Myc family of proteins is a set of transcription factors that play an important role in cell proliferation, and mutations in the MYC gene have been shown to lead to many different types of cancer. Thus, understanding the mechanisms of regulation at the MYC locus with base-pair resolution can allow us to answer important questions relating to disease biology, Below, we view a CRISPRi-validated distal enhancer in the MYC locus [chr8:127,898,412—127,899,647] through the lens of 15 different models.
+ 
 ![Figure 1](MYC_fig1.png "width=600 Deep learning model-derived browser tracks at a CRISPRi-validated distal enhancer at the MYC locus in K562 (chr8:127,898,412—127,899,647; ~162 kb downstream of the MYC promoter). From top to bottom: observed DNase-seq and ATAC-seq profiles, model predicted DNase-seq and ATAC-seq profiles at base-resolution (ChromBPNet), bias-corrected predictions at base-resolution, and sequence contribution maps. Insets compare contribution maps across DNase/ATAC (ChromBPNet), MPRA (ReporterNet), and TF ChIP-seq models (BPNet; e.g., GATA2, SP1, CEBPB, JUND, GABPB1), with high-impact motif instances annotated (e.g., GATA, SP, AP-1, ETV/ETS, CEBP). The same is repeated in HepG2.")
-
+ 
 First, examining chromatin accessibility through ChromBPNet models: the models recapitulate the observed experimental profile with high concordance. Further, the models can de-noise the profile to isolate the true underlying accessibility signal, reconciling DNase and ATAC-seq experimental methods into agreement (where raw signals can diverge due to enzyme differences).
-
+ 
 ![Figure 2](MYC_fig2.png "width=600 Observed, model-predicted, and model-corrected DNase-seq and ATAC-seq profiles by ChromBPNet.")
-
+ 
 Second, using the models, we highlight the key sequence drivers that the models identified to make their predictions (as "contribution scores"), and begin to see the underlying biological mechanism of regulation at this locus:
 
 Examining the highly contributing sequences for chromatin accessibility through ChromBPNet, we observe key transcription factors (e.g., GATA, AP1, SP, ETV) that drive accessibility—in agreement with prior understanding.
@@ -123,29 +151,29 @@ Examining the highly contributing sequences for chromatin accessibility through 
 In parallel, examining the key sequences for TF binding through BPNet, we observe the same sequences predict TF binding, in agreement with ChromBPNet—despite being trained on two entirely orthogonal assay types (TF ChIP-seq vs. DNase-seq/ATAC-seq).
 
 ![Figure 3](MYC_fig3.png "width=600 Highly contributing sequences used by the models during prediction. Insets compare contribution maps across DNase/ATAC (ChromBPNet), MPRA (ReporterNet), and TF ChIP-seq models (BPNet; e.g., GATA2, SP1, CEBPB, JUND, GABPB1), with high-impact motif instances annotated (e.g., GATA, SP, AP-1, ETV/ETS, CEBP).")
-
+ 
 Finally, we can repeat the analysis for HepG2 (also showing high concordance and known sequence motifs), and compare the highly contributing sequences between K562 vs. HepG2: we see some agreement (e.g., AP1, SP, ETV), but also some that disappear (e.g., GATA), while others that newly appear (e.g., FOX) in HepG2—showcasing the cell type variation of this enhancer.
-
+ 
 ![Figure 4](MYC_fig4.png "width=600 Comparing highly contributing sequences used by the model trained on K562 vs. HepG2.")
-
+ 
 Below, we provide an interactive browser session of the exact locus to view dynamically:
 
-{{< igv-browser panel="myc" data="myc-igv-panel.json" >}}
+{{< igv-browser panel="myc" data="myc-igv-panel.json" >}} 
 
 ## How can I use the resource?
-As part of the ENCODE Project, all data, models, analysis are shared **without restriction** at the [Project portal](https://www.encodeproject.org/).
+As part of the ENCODE Project, all data, models, analysis are available at the [Project portal](https://www.encodeproject.org/). If you use our models, please cite the [ENCODE preprint](https://doi.org/10.64898/2026.07.06.731365). 
 
-Additionally, we have tried our best to make the resource as user-friendly as possible: 
-- **Models**: We have uploaded the models for open access on [**Hugging Face**](https://huggingface.co/collections/kundajelab/encode-bpnet-models) 
+Beyond the ENCODE portal, we provide several user-friendly alternatives for accessing and visualizing our data: 
+- **Models**: We have uploaded the models for open access on [**Hugging Face**](https://huggingface.co/collections/kundajelab/encode-bpnet-models)
 - **Predictions, contributions, and instances**: We have created a [**UCSC Track Hub**](https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&hubUrl=https://kundajelab.github.io/ucsc-trackhub-encode.github.io/hub.txt) for easy, interactive browser sessions
 - **User guide**: We are currently building an _interactive_ user guide to help the community navigate and explain the resource (_work in progress_)
 - **Preprint**: For more detail, the latest ENCODE preprint is out on [_bioRxiv_](https://doi.org/10.64898/2026.07.06.731365)
-
-Lastly, we still have so much to share about the resource! We are planning to regularly share the many different ways you can use the resource (~every week) for the foreseeable future, so give us a follow and be on the lookout for more.
+ 
+We still have so much to share about the resource! We are planning to regularly share the many different ways you can use the resource (~every week) for the foreseeable future, so give us a follow and be on the lookout for more.
 
 ## References
 1. The ENCODE Project Consortium et al. The Encyclopedia of DNA Elements. _bioRxiv_ 2026.07.06.731365 (2026) ([https://doi.org/10.64898/2026.07.06.731365](https://doi.org/10.64898/2026.07.06.731365))
 2. Avsec, Ž. et al. Base-resolution models of transcription-factor binding reveal soft motif syntax. _Nat Genet_ 53, 354—366 (2021). ([https://doi.org/10.1038/s41588-021-00782-6](https://doi.org/10.1038/s41588-021-00782-6))
 3. Pampari, A. et al. ChromBPNet: bias factorized, base-resolution deep learning models of chromatin accessibility reveal cis-regulatory sequence syntax, transcription factor footprints and regulatory variants. _bioRxiv_ 2024.12.25.630221 (2024). ([https://doi.org/10.1101/2024.12.25.630221](https://doi.org/10.1101/2024.12.25.630221))
 4. Cochran, K. et al. Dissecting the cis-regulatory syntax of transcription initiation with deep learning. _bioRxiv_ 2024.05.28.596138 (2024). ([https://doi.org/10.1101/2024.05.28.596138](https://doi.org/10.1101/2024.05.28.596138))
-5. Deshpande, S. et al. A unified lexicon of predictive DNA sequence motifs from ENCODE transcription factor binding and chromatin accessibility assays. (2025) doi:10.5281/zenodo.17179111. ([https://doi.org/10.5281/zenodo.17179111](https://doi.org/10.5281/zenodo.17179111))
+5. Yun, C. M. et al. A unified lexicon of predictive DNA sequence motifs from ENCODE transcription factor binding and chromatin accessibility assays. (2025) doi:10.5281/zenodo.17179111. ([https://doi.org/10.5281/zenodo.17179111](https://doi.org/10.5281/zenodo.17179111))
