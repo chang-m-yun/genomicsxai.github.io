@@ -80,8 +80,8 @@ The Encyclopedia of DNA Elements (ENCODE) provides a reference map of the genomi
 - Blog post: Chang M. Yun, Vivekanandan Ramalingam, Vivian Hecht
 {{< /summary >}}
 
-> This post is the first of a series of blogs we will be releasing on the “ENCODE Deep Learning Collection”. We plan to release the following posts (with subject to some changes):
-> 1. Overview: What is the ENCODE Deep Learning Collection?
+> This post is the first of a series of blogs we will be releasing on the “ENCODE Deep Learning Collection”. We plan to release the following posts (subject to some change):
+> **1. Overview: What is the ENCODE Deep Learning Collection? (this post)**
 > 2. Quickstart guide (5 min): How to access the ENCODE Deep Learning Collection
 > 3. Understanding regulatory DNA using deep learning models
 > 4. BPNet: A guide to modeling TF binding
@@ -91,6 +91,7 @@ The Encyclopedia of DNA Elements (ENCODE) provides a reference map of the genomi
 > 8. Case study #1: Uncovering regulation in the MYC locus
 > 9. Case study #2: Predicting the effects of non-coding variant mutations
 > 10. Case study #3: MotifCompendium: A unified lexicon of regulatory sequence elements
+>
 > Follow us for an exciting journey on how to use deep learning models in regulatory genomics!
 
 ## DNA: Not just genes
