@@ -81,16 +81,16 @@ The Encyclopedia of DNA Elements (ENCODE) provides a reference map of the genomi
 {{< /summary >}}
 
 > This post is the first of a series of blogs we will be releasing on the “ENCODE Deep Learning Collection”. We plan to release the following posts (subject to some change):
-> **1. Overview: What is the ENCODE Deep Learning Collection? (this post)**
-> 2. Quickstart guide (5 min): How to access the ENCODE Deep Learning Collection
-> 3. Understanding regulatory DNA using deep learning models
-> 4. BPNet: A guide to modeling TF binding
-> 5. ChromBPNet: A guide to modeling chromatin accessibility
-> 6. ProCapNet: A guide to modeling transcription initiation
-> 7. ReporterNet: A guide to modeling high-throughput reporter assays
-> 8. Case study #1: Uncovering regulation in the MYC locus
-> 9. Case study #2: Predicting the effects of non-coding variant mutations
-> 10. Case study #3: MotifCompendium: A unified lexicon of regulatory sequence elements
+> 1. **Overview: What is the ENCODE Deep Learning Collection? (this post)**
+> 1. Quickstart guide (5 min): How to access the ENCODE Deep Learning Collection
+> 1. Understanding regulatory DNA using deep learning models
+> 1. BPNet: A guide to modeling TF binding
+> 1. ChromBPNet: A guide to modeling chromatin accessibility
+> 1. ProCapNet: A guide to modeling transcription initiation
+> 1. ReporterNet: A guide to modeling high-throughput reporter assays
+> 1. Case study #1: Uncovering regulation in the MYC locus
+> 1. Case study #2: Predicting the effects of non-coding variant mutations
+> 1. Case study #3: MotifCompendium: A unified lexicon of regulatory sequence elements
 >
 > Follow us for an exciting journey on how to use deep learning models in regulatory genomics!
 
@@ -101,11 +101,11 @@ DNA is organized into a secondary structure called chromatin, which includes str
 
 **TF ChIP-seq**, or TF chromatin immunoprecipitation, is used to identify TF binding sites, one TF at a time, by using antibodies to bind a given TF that is, in turn, bound to particular regions of DNA. These bound regions are then isolated and sequenced, with reads accumulating at TF binding sites. TF-ChIP-seq datasets are typically analyzed to identify peaks from these accumulated reads.
 
-![Figure: TF ChIP-seq](TFChip.gif "width=600 Illustration of TF ChIP-seq: (1) TF binds to accessible DNA; (2) DNA is broken into fragments; (3) Antibodies bind to TF-DNA complex; (4) TF-DNA complex is pulled down; (5) Isolated DNA is cleaned and sequenced; (6) Sequences accumulate around the TF binding site.")
+![Figure: TF ChIP-seq](TFChip.gif "width=300 Illustration of TF ChIP-seq: (1) TF binds to accessible DNA; (2) DNA is broken into fragments; (3) Antibodies bind to TF-DNA complex; (4) TF-DNA complex is pulled down; (5) Isolated DNA is cleaned and sequenced; (6) Sequences accumulate around the TF binding site.")
 
 In **DNase-seq** and **ATAC-seq**, DNA-digesting enzymes (DNase I and Tn5 transposase respectively) cut accessible chromatin into small fragments. These fragments are then isolated and sequenced, and accumulate in regions of open chromatin, analogously to TF-ChIP-seq. Worth noting is that DNase I and Tn5 transposase bind to specific DNA sequences, in addition to in open chromatin, leading to a slight bias in the form of an increased number of reads to particular regions. We discuss this further in subsequent sections.
 
-![Figure: DNase-seq, ATAC-seq](ChromatinAccessibility.gif "width=600 Illustration of DNase-seq, ATAC-seq: (1) DNA can wrap around histones ('closed') or remain unwound ('open'); (2) Enzymes (DNase I or Tn5 transposase) cut accessible DNA; (3) DNA fragments are sequenced; (4) Accessible regions appear as peaks.")
+![Figure: DNase-seq, ATAC-seq](ChromatinAccessibility.gif "width=300 Illustration of DNase-seq, ATAC-seq: (1) DNA can wrap around histones ('closed') or remain unwound ('open'); (2) Enzymes (DNase I or Tn5 transposase) cut accessible DNA; (3) DNA fragments are sequenced; (4) Accessible regions appear as peaks.")
 
 In addition to chromatin accessibility and transcription factor binding, gene expression is further regulated in the moments preceding transcription. **PRO-cap** uses a process of DNA-tagging and capture to determine the position of RNA polymerase II (Pol II), a protein which transcribes DNA to RNA transcription initiation. Accumulating Pol II indicates positions of transcriptional regulation, and these can be detected via accumulation of PRO-cap reads at particular genomic locations.
  
@@ -120,7 +120,21 @@ Coverage of the ENCODE Project: hundreds of biochemical markers, performed in hu
 ## Deep learning models can help uncover the mechanisms of regulation
 While the signals from the experimental assays can help directly map the locations of active regulatory genomic elements, they do not immediately answer their underlying mechanisms. Why are these locations special? How do they actually affect expression? What would happen if we were to mutate a base? To explain what we are observing, traditionally, we have performed classic, statistical enrichment-based methods to identify enriched sequences that, in turn, help identify potential mechanisms for the sequence enrichment. However, instead, we have proposed using deep learning models to help better uncover the underlying mechanisms of regulation. 
 
-Conceptually, first, we train a model that can recreate the observed experimental signal when given the DNA sequence of the region. If correctly regularized, the model should only be able to perform this reconstruction by learning and mimicking the underlying rules of regulation. Next, we pry open the black box model through interpretation methods, and extract what it has learned, thereby finding out what mechanism the model has learned. 
+Conceptually, first, we train a model that can recreate the observed experimental signal when given the DNA sequence of the region. If correctly regularized, the model should only be able to perform this reconstruction by learning and mimicking the underlying rules of regulation. 
+
+![Figure: Train a model](BPNet_Fig1.gif "width=600 Train a model to predict experimentally observed signal from DNA sequence.")
+
+Second, we pry open the black box model through interpretation methods, and extract what it has learned, thereby finding out what mechanism the model has learned. 
+
+![Figure: Interpret the model](BPNet_Fig4.gif "width=600 Identify highly contributing bases used by the model during prediction.")
+
+Additionally, using the trained model, we can predict the effect of unseen mutations in the genome.
+
+![Figure: Predict mutations](BPNet_Fig2.gif "width=600 Predict the effect of unseen mutations in the genome.")
+
+The experimental assays are often confounded by unwanted experimental artifacts, such as activity of antibodies and enzymes (e.g., DNase I, Tn5 transposase). We can train a separate model to predict only the effects of the experimental artifact (e.g., from a control experiment), and subtract its effect to isolate only the regulatory signal.
+
+![Figure: Remove bias](BPNet_Fig3.gif "width=600 Remove the effects of unwanted experimental artifacts, by training a separate model to predict the experimental effects then subtracting it from the total signal.")
 
 ## The "BPNet family" of models
 Our group has developed deep learning models, which can learn and predict the effects of DNA sequence on different types of regulation of gene expression. They include:
