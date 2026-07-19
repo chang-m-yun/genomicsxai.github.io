@@ -120,19 +120,19 @@ Coverage of the ENCODE Project: hundreds of biochemical markers, performed in hu
 ## Deep learning models can help uncover the mechanisms of regulation
 While the signals from the experimental assays can help directly map the locations of active regulatory genomic elements, they do not immediately answer their underlying mechanisms. Why are these locations special? How do they actually affect expression? What would happen if we were to mutate a base? To explain what we are observing, traditionally, we have performed classic, statistical enrichment-based methods to identify enriched sequences that, in turn, help identify potential mechanisms for the sequence enrichment. However, instead, we have proposed using deep learning models to help better uncover the underlying mechanisms of regulation. 
 
-Conceptually, first, we train a model that can recreate the observed experimental signal when given the DNA sequence of the region. If correctly regularized, the model should only be able to perform this reconstruction by learning and mimicking the underlying rules of regulation. 
+1. Conceptually, first, we train a model that can recreate the observed experimental signal when given the DNA sequence of the region. If correctly regularized, the model should only be able to perform this reconstruction by learning and mimicking the underlying rules of regulation. 
 
 ![Figure: Train a model](BPNet_Fig1.gif "width=600 Train a model to predict experimentally observed signal from DNA sequence.")
 
-Second, we pry open the black box using model interpretation methods, and extract what it has learned, thereby finding out the underlying mechanism of regulation. For example, one method is to identify and quantify the bases that the model used to make its prediction. The highly important bases can be attributed to the sequence preference of known transcription factors.   
+1. Second, we pry open the black box using model interpretation methods, and extract what it has learned, thereby finding out the underlying mechanism of regulation. For example, one method is to identify and quantify the bases that the model used to make its prediction. The highly important bases can be attributed to the sequence preference of known transcription factors.   
 
 ![Figure: Interpret the model](BPNet_Fig4.gif "width=600 Identify highly contributing bases used by the model during prediction.")
 
-Additionally, using the trained model, we can perform other augmentations. One example is to predict the effect of unseen mutations in the genome. This can be particularly useful, for example, for fine-mapping GWAS candidates. 
+1. Now with the trained model, we can perform other useful augmentations to the data. One example is to predict the effect of unseen mutations in the genome. This can be particularly useful, for example, for fine-mapping GWAS candidates. 
 
 ![Figure: Predict mutations](BPNet_Fig3.gif "width=600 Predict the effect of unseen mutations in the genome.")
 
-Another example is unwanted experimental artifacts. The experimental assays often suffer from experimental artifacts, such as activity of antibodies and enzymes (e.g., DNase I, Tn5 transposase), that confound the true signal. We can train a separate model to predict only the effects of the experimental artifact (e.g., from a control experiment), and subtract its effect to isolate only the regulatory signal.
+1. Another example is unwanted experimental artifacts. The experimental assays often suffer from experimental artifacts, such as activity of antibodies and enzymes (e.g., DNase I, Tn5 transposase), that confound the true signal. We can train a separate model to predict only the effects of the experimental artifact (e.g., from a control experiment), and subtract its effect to isolate only the regulatory signal.
 
 ![Figure: Remove bias](BPNet_Fig2.gif "width=600 Remove the effects of unwanted experimental artifacts, by training a separate model to predict the experimental effects then subtracting it from the total signal.")
 
@@ -142,13 +142,13 @@ Our group has developed deep learning models, which can learn and predict the ef
 - **ChromBPNet:** A CNN with a BPNet-like architecture trained on DNase- or ATAC-seq that predicts chromatin accessibility from DNA sequence and corrects for enzymatic bias;
 - **ProCapNet:** A CNN with a BPNet-like architecture trained on ProCAP-seq that predicts transcription initiation from DNA sequence;
 - **ReporterNet:** A CNN with a BPNet-like architecture trained on MPRA data that predicts large-scale reporter assay signal from DNA sequence.
- 
-![Figure: ChromBPNet model architecture](ChromBPNet.png "width=600 Example BPNet-style model architecture with bias-correction: ChromBPNet. From Pampari, A. et al. ChromBPNet: bias factorized, base-resolution deep learning models of chromatin accessibility reveal cis-regulatory sequence syntax, transcription factor footprints and regulatory variants. 2024.12.25.630221 Preprint at https://doi.org/10.1101/2024.12.25.630221 (2024).")
-Example BPNet-style model architecture with bias-correction: ChromBPNet. From _Pampari, A. et al. ChromBPNet: bias factorized, base-resolution deep learning models of chromatin accessibility reveal cis-regulatory sequence syntax, transcription factor footprints and regulatory variants. _bioRxiv_ 2024.12.25.630221 (2024). ([https://doi.org/10.1101/2024.12.25.630221](https://doi.org/10.1101/2024.12.25.630221))_
- 
+
 In the following section, we share an example in the MYC locus to showcase the power of the models:
 
-## Example: Regulation in the MYC locus through the lens of deep learning models
+![Figure: ChromBPNet model architecture](ChromBPNet.png "width=600 Example BPNet-style model architecture with bias-correction: ChromBPNet. From Pampari, A. et al. ChromBPNet: bias factorized, base-resolution deep learning models of chromatin accessibility reveal cis-regulatory sequence syntax, transcription factor footprints and regulatory variants. 2024.12.25.630221 Preprint at https://doi.org/10.1101/2024.12.25.630221 (2024).")
+Example BPNet-style model architecture with bias-correction: ChromBPNet. From _Pampari, A. et al. ChromBPNet: bias factorized, base-resolution deep learning models of chromatin accessibility reveal cis-regulatory sequence syntax, transcription factor footprints and regulatory variants. _bioRxiv_ 2024.12.25.630221 (2024). ([https://doi.org/10.1101/2024.12.25.630221](https://doi.org/10.1101/2024.12.25.630221))_
+
+## Case study: Regulation in the MYC locus through the lens of deep learning models
 The Myc family of proteins is a set of transcription factors that play an important role in cell proliferation, and mutations in the MYC gene have been shown to lead to many different types of cancer. Thus, understanding the mechanisms of regulation at the MYC locus with base-pair resolution can allow us to answer important questions relating to disease biology, Below, we view a CRISPRi-validated distal enhancer in the MYC locus [chr8:127,898,412—127,899,647] through the lens of 15 different models.
 
 First, examining chromatin accessibility through ChromBPNet models: the models recapitulate the observed experimental profile with high concordance. Further, the models can de-noise the profile to isolate the true underlying accessibility signal, reconciling DNase and ATAC-seq experimental methods into agreement (where raw signals can diverge due to enzyme differences).
