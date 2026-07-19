@@ -120,19 +120,19 @@ Coverage of the ENCODE Project: hundreds of biochemical markers, performed in hu
 ## Deep learning models can help uncover the mechanisms of regulation
 While the signals from the experimental assays can help directly map the locations of active regulatory genomic elements, they do not immediately answer their underlying mechanisms. Why are these locations special? How do they actually affect expression? What would happen if we were to mutate a base? To explain what we are observing, traditionally, we have performed classic, statistical enrichment-based methods to identify enriched sequences that, in turn, help identify potential mechanisms for the sequence enrichment. However, instead, we have proposed using deep learning models to help better uncover the underlying mechanisms of regulation. 
 
-**1.** Conceptually, first, we train a model that can recreate the observed experimental signal when given the DNA sequence of the region. If correctly regularized, the model should only be able to perform this reconstruction by learning and mimicking the underlying rules of regulation. 
+**1.** Conceptually, first, we train a model that can reconstruct the observed experimental signal when given the DNA sequence of the region. If correctly regularized, the model should only be able to perform this reconstruction by learning and mimicking the underlying rules of regulation. 
 
 ![Figure: Train a model](BPNet_Fig1.gif "width=600 Train a model to predict experimentally observed signal from DNA sequence.")
 
-**2.** Second, we pry open the black box model using interpretation methods, and extract what it has learned, thereby identifying the underlying mechanisms of regulation. For example, one method is to identify and quantify the bases that the model used to make its prediction (e.g., DeepLIFT/DeepSHAP). The most important bases can directly be attributed to the sequence preference of known transcription factors.   
+**2.** Second, we open up the trained, black box model using mechanistic interpretation methods, and extract what it has learned—thereby identifying the underlying mechanisms of regulation. For example, one method is to identify and quantify the bases that the model used to make its prediction (e.g., DeepLIFT/DeepSHAP). The most important bases can directly be attributed to the sequence preference of known transcription factors.   
 
 ![Figure: Interpret the model](BPNet_Fig4.gif "width=600 Identify highly contributing bases used by the model during prediction.")
 
-**3.** Now with the trained model, we can perform other useful augmentations to the data. One example is to predict the effect of unseen mutations in the genome. This can be particularly useful, for example, for fine-mapping GWAS candidates. 
+**3.** With the trained model, we can additionally perform other useful augmentations to the data. One example is to predict the effect of unseen mutations in the genome. This can be particularly useful, for example, for identifying causal mutations (e.g., fine-mapping GWAS candidates). 
 
 ![Figure: Predict mutations](BPNet_Fig3.gif "width=600 Predict the effect of unseen mutations in the genome.")
 
-**4.** Another example is unwanted experimental artifacts. The experimental assays often suffer from experimental artifacts, such as activity of antibodies and enzymes (e.g., DNase I, Tn5 transposase), that confound the true signal. We can train a separate model to predict only the effects of the experimental artifact (e.g., from a control experiment), and subtract its effect to isolate only the regulatory signal.
+**4.** Another example is to remove undesirable experimental artifacts from the data. Experimental assays often suffer from unwanted artifacts, such as activity of antibodies and enzymes (e.g., DNase I, Tn5 transposase), that confound the true underlying signal. We can train a separate model to predict only the effects of the experimental artifact (e.g., from a control experiment), and subtract its effect to isolate _only_ the regulatory signal.
 
 ![Figure: Remove bias](BPNet_Fig2.gif "width=600 Remove the effects of unwanted experimental artifacts, by training a separate model to predict the experimental effects then subtracting it from the total signal.")
 
