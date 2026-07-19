@@ -130,11 +130,11 @@ Second, we pry open the black box using model interpretation methods, and extrac
 
 Additionally, using the trained model, we can perform other augmentations. One example is to predict the effect of unseen mutations in the genome. This can be particularly useful, for example, for fine-mapping GWAS candidates. 
 
-![Figure: Predict mutations](BPNet_Fig2.gif "width=600 Predict the effect of unseen mutations in the genome.")
+![Figure: Predict mutations](BPNet_Fig3.gif "width=600 Predict the effect of unseen mutations in the genome.")
 
 Another example is unwanted experimental artifacts. The experimental assays often suffer from experimental artifacts, such as activity of antibodies and enzymes (e.g., DNase I, Tn5 transposase), that confound the true signal. We can train a separate model to predict only the effects of the experimental artifact (e.g., from a control experiment), and subtract its effect to isolate only the regulatory signal.
 
-![Figure: Remove bias](BPNet_Fig3.gif "width=600 Remove the effects of unwanted experimental artifacts, by training a separate model to predict the experimental effects then subtracting it from the total signal.")
+![Figure: Remove bias](BPNet_Fig2.gif "width=600 Remove the effects of unwanted experimental artifacts, by training a separate model to predict the experimental effects then subtracting it from the total signal.")
 
 ## The "BPNet family" of models
 Our group has developed deep learning models, which can learn and predict the effects of DNA sequence on different types of regulation of gene expression. They include:
