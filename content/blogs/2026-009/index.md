@@ -124,15 +124,15 @@ Conceptually, first, we train a model that can recreate the observed experimenta
 
 ![Figure: Train a model](BPNet_Fig1.gif "width=600 Train a model to predict experimentally observed signal from DNA sequence.")
 
-Second, we pry open the black box model through interpretation methods, and extract what it has learned, thereby finding out what mechanism the model has learned. 
+Second, we pry open the black box using model interpretation methods, and extract what it has learned, thereby finding out the underlying mechanism of regulation. For example, one method is to identify and quantify the bases that the model used to make its prediction. The highly important bases can be attributed to the sequence preference of known transcription factors.   
 
 ![Figure: Interpret the model](BPNet_Fig4.gif "width=600 Identify highly contributing bases used by the model during prediction.")
 
-Additionally, using the trained model, we can predict the effect of unseen mutations in the genome.
+Additionally, using the trained model, we can perform other augmentations. One example is to predict the effect of unseen mutations in the genome. This can be particularly useful, for example, for fine-mapping GWAS candidates. 
 
 ![Figure: Predict mutations](BPNet_Fig2.gif "width=600 Predict the effect of unseen mutations in the genome.")
 
-The experimental assays are often confounded by unwanted experimental artifacts, such as activity of antibodies and enzymes (e.g., DNase I, Tn5 transposase). We can train a separate model to predict only the effects of the experimental artifact (e.g., from a control experiment), and subtract its effect to isolate only the regulatory signal.
+Another example is unwanted experimental artifacts. The experimental assays often suffer from experimental artifacts, such as activity of antibodies and enzymes (e.g., DNase I, Tn5 transposase), that confound the true signal. We can train a separate model to predict only the effects of the experimental artifact (e.g., from a control experiment), and subtract its effect to isolate only the regulatory signal.
 
 ![Figure: Remove bias](BPNet_Fig3.gif "width=600 Remove the effects of unwanted experimental artifacts, by training a separate model to predict the experimental effects then subtracting it from the total signal.")
 
