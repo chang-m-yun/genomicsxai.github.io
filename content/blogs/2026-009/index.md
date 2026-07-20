@@ -94,8 +94,15 @@ The Encyclopedia of DNA Elements (ENCODE) provides a reference map of the genomi
 >
 > Follow us for an exciting journey on how to use deep learning models in regulatory genomics!
 
-## DNA: Not just genes
-The human genome contains approximately 3.2 billion base pairs of DNA. While we often think of genes that code for proteins as the primary component of DNA, they account for only 1-2% of the genome. Gene expression–the process by which genes are converted into functional products–is a highly regulated process. Genes are expressed at varying rates, and sometimes not at all–that is fundamental to the function of all living things. Many portions of the 98% of DNA not containing genes, also known as non-coding DNA, play a major role in regulating gene expression, as do the higher-order organization of DNA and various proteins that bind to it. 
+## Intro: DNA is not _just_ genes
+The human genome contains approximately 3.2 billion base pairs of DNA. Yet, with only around 20,000 protein-coding genes, genes account for only 1-2% (~50 Mb) of the human genome. _So what does the remaining 98% do?_ 
+
+Some of the remaining fraction contributes to the expression of genes: the process by which genes are converted into their encoded proteins and other functional products. Genes are expressed at varying rates, and sometimes not at all, that allow cells to adjust according to their needs, changing cell states (e.g., mitosis vs. G1 phase) and even cell types (e.g., red blood cell vs. hematopoietic stem cells). This change in gene expression is also encoded in large parts of the genome (significantly larger than the fraction of genome actually coding for proteins). 
+
+However, not all of the remaining non-coding DNA actively contributes to gene expression, or any function in particular. In fact, most of the genome generally does not serve any known functional purpose. And distinguishing between functionally active and inactive parts of the non-coding genome has been a non-trivial task.
+ 
+## ENCODE: An Encyclopedia of DNA Elements
+The [**Encyclopedia of DNA Elements** (**ENCODE**)](https://www.encodeproject.org/) is a public research project that was launched to identify and understand all functionally active elements in the genome: an "Encyclopedia" of DNA elements, of sorts. In order to identify functional elements, the field has developed several experimental methods that characterize sequences that contribute to key functions.
 
 DNA is organized into a secondary structure called chromatin, which includes structural proteins as well as transcription factors (TFs), or proteins that bind to DNA to up- or down-regulate gene expression. Similarly to thread wound around a spool, not all chromatin is accessible at all times, and binding of various TFs both influences and is determined by chromatin accessibility. Several experimental methods have been developed to characterize transcription factor binding, chromatin accessibility and transcription initiation, or how the process of gene expression begins:
 
@@ -110,29 +117,28 @@ In **DNase-seq** and **ATAC-seq**, DNA-digesting enzymes (DNase I and Tn5 transp
 In addition to chromatin accessibility and transcription factor binding, gene expression is further regulated in the moments preceding transcription. **PRO-cap** uses a process of DNA-tagging and capture to determine the position of RNA polymerase II (Pol II), a protein which transcribes DNA to RNA transcription initiation. Accumulating Pol II indicates positions of transcriptional regulation, and these can be detected via accumulation of PRO-cap reads at particular genomic locations.
  
 And **MPRAs** and related high throughput reporter assays are used to experimentally measure whether particular sequences are in fact responsible for regulating gene expression. In general, a candidate regulatory element, or ccRE, is inserted into a short sequence which also includes a measurable reporter output, such as a fluorescent molecule. The greater the level of the measured reporter, the more active the regulatory element.
- 
-## ENCODE: An Encyclopedia of DNA Elements
-The [**Encyclopedia of DNA Elements**] (**ENCODE**)](https://www.encodeproject.org/) is a research consortium dedicated to building a comprehensive "Encyclopedia" of genome-wide regulatory elements. ENCODE has developed a set of approximately 16,000 standardized, uniformly processed datasets for the assays described above and many others, across a wide range of cell lines, primary cells and tissues. These are organized and publicly available for download via the [ENCODE portal](https://encodeproject.org). The consortium recently released a preprint describing the newly included datasets in the fourth and final phase of the project [ENCODE 4](https://www.biorxiv.org/content/10.64898/2026.07.06.731365v1).
- 
+
+ENCODE has developed a set of approximately 16,000 standardized, uniformly processed datasets for the assays described above and many others, across a wide range of cell lines, primary cells and tissues. These are organized and publicly available for download via the [ENCODE portal](https://encodeproject.org). The consortium recently released a preprint describing the newly included datasets in the fourth and final phase of the project [ENCODE 4](https://www.biorxiv.org/content/10.64898/2026.07.06.731365v1).
+
 ![Figure: ENCODE cube](ENCODE_cube.png "width=600 Coverage of the ENCODE Project: 100s of biochemical markers, performed in 100s of cell types and tissues, measured across 3 billion genomic positions. From Roadmap Epigenomics Consortium et al. Integrative analysis of 111 reference human epigenomes. Nature 518, 317–330 (2015). (https://doi.org/10.1038/nature14248)")
 Coverage of the ENCODE Project: hundreds of biochemical markers, performed in hundreds of cell types and tissues, measured across 3 billion genomic positions. From _Roadmap Epigenomics Consortium et al. Integrative analysis of 111 reference human epigenomes. Nature 518, 317–330 (2015). ([https://doi.org/10.1038/nature14248](https://doi.org/10.1038/nature14248))_
  
 ## Deep learning models can help uncover the mechanisms of regulation
-While the signals from the experimental assays can help directly map the locations of active regulatory genomic elements, they do not immediately answer their underlying mechanisms. Why are these locations special? How do they actually affect expression? What would happen if we were to mutate a base? To explain what we are observing, traditionally, we have performed classic, statistical enrichment-based methods to identify enriched sequences that, in turn, help identify potential mechanisms for the sequence enrichment. However, instead, we have proposed using deep learning models to help better uncover the underlying mechanisms of regulation. 
+However, while the signals from the experimental assays can help directly map the locations of active regulatory genomic elements, they do not answer how and why they work. _Why are these locations special? How do they actually affect expression? What would happen if we were to mutate a base?_ To explain what we are observing, traditionally, we have performed classic, statistical enrichment-based methods to identify enriched sequences that, in turn, help identify potential mechanisms for the sequence enrichment. However, instead, we have proposed using deep learning models to help better uncover the underlying mechanisms of regulation. 
 
 **1.** Conceptually, first, we train a model that can reconstruct the observed experimental signal when given the DNA sequence of the region. If correctly regularized, the model should only be able to perform this reconstruction by learning and mimicking the underlying rules of regulation. 
 
 ![Figure: Train a model](BPNet_Fig1.gif "width=600 Train a model to predict experimentally observed signal from DNA sequence.")
 
-**2.** Second, we open up the trained, black box model using mechanistic interpretation methods, and extract what it has learned—thereby identifying the underlying mechanisms of regulation. For example, one method is to identify and quantify the bases that the model used to make its prediction (e.g., DeepLIFT/DeepSHAP). The most important bases can directly be attributed to the sequence preference of known transcription factors.   
+**2.** Second, we look inside the trained model using interpretation methods, and extract what it has learned—thereby identifying the underlying mechanisms of regulation. For example, one method is to identify and quantify the bases that the model used to make its prediction (e.g., DeepLIFT/DeepSHAP). The most important bases can directly be attributed to the sequence preference of known transcription factors.   
 
 ![Figure: Interpret the model](BPNet_Fig4.gif "width=600 Identify highly contributing bases used by the model during prediction.")
 
-**3.** With the trained model, we can additionally perform other useful augmentations to the data. One example is to predict the effect of unseen mutations in the genome. This can be particularly useful, for example, for identifying causal mutations (e.g., fine-mapping GWAS candidates). 
+**3.** Additionally, with the trained model, we can now perform other useful augmentations to the data. One example is to predict the effect of unseen mutations in the genome. This can be particularly useful, for example, for identifying causal mutations (e.g., fine-mapping GWAS candidates). 
 
 ![Figure: Predict mutations](BPNet_Fig3.gif "width=600 Predict the effect of unseen mutations in the genome.")
 
-**4.** Another example is to remove undesirable experimental artifacts from the data. Experimental assays often suffer from unwanted artifacts, such as activity of antibodies and enzymes (e.g., DNase I, Tn5 transposase), that confound the true underlying signal. We can train a separate model to predict only the effects of the experimental artifact (e.g., from a control experiment), and subtract its effect to isolate _only_ the regulatory signal.
+**4.** Another example of augmentation is to remove undesirable experimental artifacts from the data. Experimental assays often suffer from unwanted artifacts, such as activity of antibodies and enzymes (e.g., DNase I, Tn5 transposase), that confound the true underlying signal. We can train a separate model to predict only the effects of the experimental artifact (e.g., from a control experiment), and subtract its effect to isolate _only_ the regulatory signal.
 
 ![Figure: Remove bias](BPNet_Fig2.gif "width=600 Remove the effects of unwanted experimental artifacts, by training a separate model to predict the experimental effects then subtracting it from the total signal.")
 
