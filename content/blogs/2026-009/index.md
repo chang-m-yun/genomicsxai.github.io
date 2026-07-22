@@ -1,6 +1,6 @@
 ---
 post_id: "2026-009"
-title: "BPNet-GARDEN: A collection of BPNet-style models trained across ENCODEDe-coding ENCODE (DECODE): Understanding regulatory DNA through Deep learning models"
+title: "BPNet-GARDEN: A collection of BPNet-style models trained across ENCODE"
 
 # Optional: image filename "your-image.png" in the same folder
 image: "encode_logo.png"
@@ -147,7 +147,7 @@ DNase and ATAC-seq suffer from unwanted artifacts related to the preference of D
 
 **3.** Once we have the sequence interpretations we use a suite of post-processing tools to extract, consolidate and cluster the potential transcription factor binding sites. We also map the sites back to the genome, which is very useful for downstream quantitative analyses. 
 
- An example application, shown below, is to predict the effect of unseen mutations in the genome. This can be particularly useful, for example, for identifying causal mutations. 
+An example application, shown below, is to predict the effect of unseen mutations in the genome. This can be particularly useful, for example, for identifying causal mutations. 
 
 ![Figure: Predict mutations](BPNet_Fig3.gif "width=600 Predict the effect of unseen mutations in the genome.")
 
@@ -201,4 +201,3 @@ We still have so much to share about the resource! We are planning to regularly 
 3. Pampari, A. et al. ChromBPNet: bias factorized, base-resolution deep learning models of chromatin accessibility reveal cis-regulatory sequence syntax, transcription factor footprints and regulatory variants. _bioRxiv_ 2024.12.25.630221 (2024). ([https://doi.org/10.1101/2024.12.25.630221](https://doi.org/10.1101/2024.12.25.630221))
 4. Cochran, K. et al. Dissecting the cis-regulatory syntax of transcription initiation with deep learning. _bioRxiv_ 2024.05.28.596138 (2024). ([https://doi.org/10.1101/2024.05.28.596138](https://doi.org/10.1101/2024.05.28.596138))
 5. Yun, C. M. et al. A unified lexicon of predictive DNA sequence motifs from ENCODE transcription factor binding and chromatin accessibility assays. (2025) doi:10.5281/zenodo.17179111. ([https://doi.org/10.5281/zenodo.17179111](https://doi.org/10.5281/zenodo.17179111))
-
