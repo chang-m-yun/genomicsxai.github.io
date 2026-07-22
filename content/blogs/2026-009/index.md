@@ -1,6 +1,6 @@
 ---
 post_id: "2026-009"
-title: "De-coding ENCODE: Understanding regulatory DNA through Deep learning models"
+title: "BPNet-GARDEN: A collection of BPNet-style models trained across ENCODEDe-coding ENCODE (DECODE): Understanding regulatory DNA through Deep learning models"
 
 # Optional: image filename "your-image.png" in the same folder
 image: "encode_logo.png"
@@ -70,84 +70,86 @@ revision_history:
 ---
 
 {{< summary >}}
-The Encyclopedia of DNA Elements (ENCODE) provides a reference map of the genomic basis of gene regulation and represents more than two decades of systematic investigation into genome function, as described in our recently submitted manuscript on the final phase of the [**ENCODE Project**](https://doi.org/10.64898/2026.07.06.731365). As part of the project, we trained BPNet models on 2,339 TF-ChIP-seq across 788 TFs; ChromBPNet models on 1,512 DNase-seq and ATAC-seq across 408 samples; ProCapNet models on six PRO-Cap across 6 samples; and ReporterNet models on three lenti-MPRA experiments, one ATAC-STARR experiment, one WG-STARR experiment, and three sets of aggregated MPRA experiments. All models, predictions, interpretation scores, discovered motifs, and genomic instances are openly available for reuse. Here, we present an example of how these models can be used to uncover the underlying rules of gene regulation. Over the next several weeks, we will share additional articles highlighting other exciting ways to use this resource.
-
+The Encyclopedia of DNA Elements (ENCODE) provides a reference map of functional elements in the human genome. This work reflects more than two decades of systematic investigation into genome function and is described in our recent manuscript on the fourth and final phase of the [**ENCODE Project**](https://doi.org/10.64898/2026.07.06.731365).
+As part of this effort, we developed BPNet-GARDEN (BPNet-style reGulAtory DNA deep learning models trained on ENCODE)have released–a collection of deep learning models trained on approximately 4,000 datasets spanning multiple layers of gene regulation, including transcription-factor binding, chromatin accessibility, transcription initiation, and regulatory activity. Along with the trained models, we provide model predictions, sequence-interpretation scores, discovered motifs, and their genomic instances to support a wide range of gene-regulatory analyses.
+In this first post of a broader series, we introduce BPNet-GARDENthe ENCODE Deep Learning Collection and illustrate how it can be used to uncover the sequence rules underlying gene regulation. Over the coming weeks, we will share additional articles highlighting other applications of this resource.
 **Contributions**:
 - Primary contributors: Vivekanandan Ramalingam, Chang M. Yun, Vivian Hecht, Aman Patel, Anusri Pampari, Ziwei Chen, Johannes Linder
 - Secondary contributors: Georgi K. Marinov, Kelly Cochran, Abhimanyu Banerjee, Surag Nair, Salil S. Deshpande, Zahoor Zafrulla
 - Tertiary contributors: Alex M. Tseng, Amr Alexandari, Mahfuza Sharmin, Avanti Shrikumar, Jacob M. Schreiber, Caleb Lareau
 - Corresponding contributors: Anshul Kundaje
-- Blog post: Chang M. Yun, Vivekanandan Ramalingam, Vivian Hecht
+- Blog post: Chang M. Yun, Vivekanandan Ramalingam, Vivian Hecht (equal contributions)
 {{< /summary >}}
 
-> This post is the first of a series of blogs we will be releasing on the “ENCODE Deep Learning Collection”. We plan to release the following posts (subject to some change):
+> This post is the first of a series of blogs we will be releasing on the “ENCODE Deep Learning Collection”. We plan to release the following posts:
 > 1. **Overview: What is the ENCODE Deep Learning Collection? (this post)**
-> 1. Quickstart guide (5 min): How to access the ENCODE Deep Learning Collection
+> 1. Quickstart guide : How to access the ENCODE Deep Learning Collection
 > 1. Understanding regulatory DNA using deep learning models
-> 1. BPNet: A guide to modeling TF binding
-> 1. ChromBPNet: A guide to modeling chromatin accessibility
-> 1. ProCapNet: A guide to modeling transcription initiation
-> 1. ReporterNet: A guide to modeling high-throughput reporter assays
-> 1. Case study #1: Uncovering regulation in the MYC locus
-> 1. Case study #2: Predicting the effects of non-coding variant mutations
-> 1. Case study #3: MotifCompendium: A unified lexicon of regulatory sequence elements
->
-> Follow us for an exciting journey on how to use deep learning models in regulatory genomics!
+> 1. A guide to the DECODE BPNet model resource for modeling TF binding
+> 1. A guide to the DECODE ChromBPNet resource for modeling chromatin accessibility
+> 1. Case study #1: Predicting the effects of non-coding variant mutations
+> 1. Case study #2: MotifCompendium: A unified lexicon of regulatory sequence motifs
+> 1. Case study #3: Understanding cell type-specific activity of cis-regulatory elements
+> 1. Postscript: successfully running production-scale projects in an academic setting
 
-## Intro: DNA is not _just_ genes
-The human genome contains approximately 3.2 billion base pairs of DNA. Yet, with only around 20,000 protein-coding genes, genes account for only 1-2% (~50 Mb) of the human genome. _So what does the remaining 98% do?_ 
+## DNA: not just genes
+The human genome contains approximately 3.2 billion base pairs of DNA. While we often think of genes as the primary component of DNA, they account for only 1-2% of the genome. Gene expression, the process by which genes are converted into functional products, is a highly regulated process–genes are expressed at varying rates, and sometimes not at all–that is fundamental to the function of all living things. Many portions of the 98% of DNA not containing genes, also known as non-coding DNA, play a major role in regulating gene expression, as do the higher-order organization of DNA and various proteins that bind to it. 
 
-Some of the remaining fraction contributes to the expression of genes: the process by which genes are converted into their encoded proteins and other functional products. Genes are expressed at varying rates, and sometimes not at all, that allow cells to adjust according to their needs, changing cell states (e.g., mitosis vs. G1 phase) and even cell types (e.g., red blood cell vs. hematopoietic stem cells). This change in gene expression is also encoded in large parts of the genome (significantly larger than the fraction of genome actually coding for proteins). 
-
-However, not all of the remaining non-coding DNA actively contributes to gene expression, or any function in particular. In fact, most of the genome generally does not serve any known functional purpose. And distinguishing between functionally active and inactive parts of the non-coding genome has been a non-trivial task.
+DNA is organized into a higher-order structure called chromatin, which includes structural proteins as well as transcription factors (TFs), or proteins that bind to DNA to up- or down-regulate gene expression. Similarly to thread wound around a spool, not all chromatin is accessible at all times, and binding of various TFs both influences and is determined by chromatin accessibility. Chromatin is highly cell- and species-specific, and plays an essential role in cell differentiation and responses to environmental stimuli such as nutrient stress; moreover, chromatin dysregulation can lead to improper interactions between regulatory elements and genes, which can in turn lead to cancer and other diseases. 
  
 ## ENCODE: An Encyclopedia of DNA Elements
-The [**Encyclopedia of DNA Elements** (**ENCODE**)](https://www.encodeproject.org/) is a public research project that was launched to identify and understand all functionally active elements in the genome: an "Encyclopedia" of DNA elements, of sorts. In order to identify functional elements, the field has developed several experimental methods that characterize sequences that contribute to key functions.
+The [**Encyclopedia of DNA Elements** (**ENCODE**) Consortium](https://www.encodeproject.org/), a public research project dedicated to building a comprehensive "Encyclopedia" of genome-wide regulatory elements has made major contributions towards characterizing the complex and diverse components of the regulatory landscape. We describe a few of the experimental methods that researchers in the field have developed to interrogate chromatin accessibility below.
 
-DNA is organized into a secondary structure called chromatin, which includes structural proteins as well as transcription factors (TFs), or proteins that bind to DNA to up- or down-regulate gene expression. Similarly to thread wound around a spool, not all chromatin is accessible at all times, and binding of various TFs both influences and is determined by chromatin accessibility. Several experimental methods have been developed to characterize transcription factor binding, chromatin accessibility and transcription initiation, or how the process of gene expression begins:
-
-**TF ChIP-seq**, or TF chromatin immunoprecipitation, is used to identify TF binding sites, one TF at a time, by using antibodies to bind a given TF that is, in turn, bound to particular regions of DNA. These bound regions are then isolated and sequenced, with reads accumulating at TF binding sites. TF-ChIP-seq datasets are typically analyzed to identify peaks from these accumulated reads.
+**TF ChIP-seq**, or TF chromatin immunoprecipitation, is used to identify TF binding sites, one TF at a time, by using antibodies to bind a given TF that is, in turn, bound to particular regions of DNA. These bound regions are then isolated and sequenced, with reads accumulating at TF binding sites. TF-ChIP-seq datasets are typically analyzed to identify peaks from these accumulated reads. Short DNA sequences that are statistically enriched within these peaks can then be identified as candidate motifs that may contribute to transcription-factor binding.
 
 ![Figure: TF ChIP-seq](TFChIP.gif "width=300 Illustration of TF ChIP-seq: (1) TF binds to accessible DNA; (2) DNA is broken into fragments; (3) Antibodies bind to TF-DNA complex; (4) TF-DNA complex is pulled down; (5) Isolated DNA is cleaned and sequenced; (6) Sequences accumulate around the TF binding site.")
 
-In **DNase-seq** and **ATAC-seq**, DNA-digesting enzymes (DNase I and Tn5 transposase respectively) cut accessible chromatin into small fragments. These fragments are then isolated and sequenced, and accumulate in regions of open chromatin, analogously to TF-ChIP-seq. Worth noting is that DNase I and Tn5 transposase bind to specific DNA sequences, in addition to in open chromatin, leading to a slight bias in the form of an increased number of reads to particular regions. We discuss this further in subsequent sections.
+In **DNase-seq** and **ATAC-seq**, DNA-digesting enzymes (DNase I and Tn5 transposase, respectively) cut accessible chromatin into small fragments. These fragments are then isolated and sequenced, and accumulate in regions of open chromatin, analogously to TF-ChIP-seq. Worth noting is that DNase I and Tn5 transposase bind to specific DNA sequences, in addition to in open chromatin, leading to a slight bias in the form of an increased number of reads to particular regions. We discuss this further in subsequent sections.
 
 ![Figure: DNase-seq, ATAC-seq](ChromatinAccessibility.gif "width=300 Illustration of DNase-seq, ATAC-seq: (1) DNA can wrap around histones ('closed') or remain unwound ('open'); (2) Enzymes (DNase I or Tn5 transposase) cut accessible DNA; (3) DNA fragments are sequenced; (4) Accessible regions appear as peaks.")
 
 In addition to chromatin accessibility and transcription factor binding, gene expression is further regulated in the moments preceding transcription. **PRO-cap** uses a process of DNA-tagging and capture to determine the position of RNA polymerase II (Pol II), a protein which transcribes DNA to RNA transcription initiation. Accumulating Pol II indicates positions of transcriptional regulation, and these can be detected via accumulation of PRO-cap reads at particular genomic locations.
  
-And **MPRAs** and related high throughput reporter assays are used to experimentally measure whether particular sequences are in fact responsible for regulating gene expression. In general, a candidate regulatory element, or ccRE, is inserted into a short sequence which also includes a measurable reporter output, such as a fluorescent molecule. The greater the level of the measured reporter, the more active the regulatory element.
+And **MPRAs** and related high throughput reporter assays are used to experimentally measure whether particular sequences are in fact responsible for regulating gene expression. In general, a candidate Cis-Regulatory Element, or cCRE, is inserted into a short sequence which also includes a measurable reporter output, such as a fluorescent molecule. The greater the level of the measured reporter, the more active the regulatory element.
 
 ENCODE has developed a set of approximately 16,000 standardized, uniformly processed datasets for the assays described above and many others, across a wide range of cell lines, primary cells and tissues. These are organized and publicly available for download via the [ENCODE portal](https://encodeproject.org). The consortium recently released a preprint describing the newly included datasets in the fourth and final phase of the project [ENCODE 4](https://www.biorxiv.org/content/10.64898/2026.07.06.731365v1).
 
 ![Figure: ENCODE cube](ENCODE_cube.png "width=600 Coverage of the ENCODE Project: 100s of biochemical markers, performed in 100s of cell types and tissues, measured across 3 billion genomic positions. From Roadmap Epigenomics Consortium et al. Integrative analysis of 111 reference human epigenomes. Nature 518, 317–330 (2015). (https://doi.org/10.1038/nature14248)")
 Coverage of the ENCODE Project: hundreds of biochemical markers, performed in hundreds of cell types and tissues, measured across 3 billion genomic positions. From _Roadmap Epigenomics Consortium et al. Integrative analysis of 111 reference human epigenomes. Nature 518, 317–330 (2015). ([https://doi.org/10.1038/nature14248](https://doi.org/10.1038/nature14248))_
  
-## Deep learning models can help uncover the mechanisms of regulation
-However, while the signals from the experimental assays can help directly map the locations of active regulatory genomic elements, they do not answer how and why they work. _Why are these locations special? How do they actually affect expression? What would happen if we were to mutate a base?_ To explain what we are observing, traditionally, we have performed classic, statistical enrichment-based methods to identify enriched sequences that, in turn, help identify potential mechanisms for the sequence enrichment. However, instead, we have proposed using deep learning models to help better uncover the underlying mechanisms of regulation. 
+## The BPNet family of deep learning models can help uncover the mechanisms of regulation
+However, while the signals from the experimental assays can help map the locations of active regulatory genomic elements, they do provide limited mechanistic insights, and we are left with some fundamental questions, for example:
 
-**1.** Conceptually, first, we train a model that can reconstruct the observed experimental signal when given the DNA sequence of the region. If correctly regularized, the model should only be able to perform this reconstruction by learning and mimicking the underlying rules of regulation. 
+*Which sequence features drive TF binding and chromatin accessibility? 
+*How do combinations and arrangements of motifs influence TF occupancy? 
+*What would happen if an individual nucleotide were altered? 
+*Is a disease-causing mutation causing its effect via changes to a transcription factor binding site?
 
-![Figure: Train a model](BPNet_Fig1.gif "width=600 Train a model to predict experimentally observed signal from DNA sequence.")
-
-**2.** Second, we look inside the trained model using interpretation methods, and extract what it has learned—thereby identifying the underlying mechanisms of regulation. For example, one method is to identify and quantify the bases that the model used to make its prediction (e.g., DeepLIFT/DeepSHAP). The most important bases can directly be attributed to the sequence preference of known transcription factors.   
-
-![Figure: Interpret the model](BPNet_Fig4.gif "width=600 Identify highly contributing bases used by the model during prediction.")
-
-**3.** Additionally, with the trained model, we can now perform other useful augmentations to the data. One example is to predict the effect of unseen mutations in the genome. This can be particularly useful, for example, for identifying causal mutations (e.g., fine-mapping GWAS candidates). 
-
-![Figure: Predict mutations](BPNet_Fig3.gif "width=600 Predict the effect of unseen mutations in the genome.")
-
-**4.** Another example of augmentation is to remove undesirable experimental artifacts from the data. Experimental assays often suffer from unwanted artifacts, such as activity of antibodies and enzymes (e.g., DNase I, Tn5 transposase), that confound the true underlying signal. We can train a separate model to predict only the effects of the experimental artifact (e.g., from a control experiment), and subtract its effect to isolate _only_ the regulatory signal.
-
-![Figure: Remove bias](BPNet_Fig2.gif "width=600 Remove the effects of unwanted experimental artifacts, by training a separate model to predict the experimental effects then subtracting it from the total signal.")
-
-## The "BPNet family" of models
-Our group has developed deep learning models, which can learn and predict the effects of DNA sequence on different types of regulation of gene expression. They include:
+Our group has developed a suite of deep learning models and downstream tools to address these questions. They include:
 - **BPNet:** A convolutional neural network (CNN) trained on TF-ChIP-seq that predicts the binding of a TF from DNA sequence;
 - **ChromBPNet:** A CNN with a BPNet-like architecture trained on DNase- or ATAC-seq that predicts chromatin accessibility from DNA sequence and corrects for enzymatic bias;
 - **ProCapNet:** A CNN with a BPNet-like architecture trained on ProCAP-seq that predicts transcription initiation from DNA sequence;
 - **ReporterNet:** A CNN with a BPNet-like architecture trained on MPRA data that predicts large-scale reporter assay signal from DNA sequence.
+
+We describe the basic steps of our workflow below, with more detailed explanations available in the manuscripts [ChromBPNet, BPNet, ProCapNet, ReporterNet].
+
+**1.** We begin by training a model that can reconstruct the observed experimental signal when provided the DNA sequence of the region. We expect that the model should only be able to perform this reconstruction by learning the underlying rules of chromatin regulation. While the input data varies based on assay, the basic model architecture remains the same.
+
+![Figure: Train a model](BPNet_Fig1.gif "width=600 Train a model to predict experimentally observed signal from DNA sequence.")
+
+DNase and ATAC-seq suffer from unwanted artifacts related to the preference of DNase and Tn5 to cut at specific sequence positions. Using ChromBPNet, we train a separate model to predict only the effects of the experimental artifact, and subtract its effect to isolate the regulatory signal.
+
+![Figure: Remove bias](BPNet_Fig2.gif "width=600 Remove the effects of unwanted experimental artifacts, by training a separate model to predict the experimental effects then subtracting it from the total signal.")
+
+**2.**We next interpret the weights of the trained model to understand which positions in the training sequences were most important to its predictions using DeepLIFT (ref). The most important positions, and bases at those positions, can often be directly attributed to the sequence binding preference of known transcription factors.   
+
+![Figure: Interpret the model](BPNet_Fig4.gif "width=600 Identify highly contributing bases used by the model during prediction.")
+
+**3.** Once we have the sequence interpretations we use a suite of post-processing tools to extract, consolidate and cluster the potential transcription factor binding sites. We also map the sites back to the genome, which is very useful for downstream quantitative analyses. 
+
+ An example application, shown below, is to predict the effect of unseen mutations in the genome. This can be particularly useful, for example, for identifying causal mutations. 
+
+![Figure: Predict mutations](BPNet_Fig3.gif "width=600 Predict the effect of unseen mutations in the genome.")
 
 In the following section, we share an example in the MYC locus to showcase the power of the models:
 
