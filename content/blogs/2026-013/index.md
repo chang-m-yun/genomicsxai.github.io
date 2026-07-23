@@ -77,12 +77,12 @@ For quick and easy introduction to the latest ENCODE 4 deep learning models, we 
 - Secondary contributors: Georgi K. Marinov, Kelly Cochran, Abhimanyu Banerjee, Surag Nair, Salil S. Deshpande, Zahoor Zafrulla, Riya Sinha
 - Tertiary contributors: Alex M. Tseng, Amr Alexandari, Mahfuza Sharmin, Avanti Shrikumar, Jacob M. Schreiber, Caleb Lareau
 - Corresponding contributors: Anshul Kundaje
-- Blog post: Chang M. Yun, Vivekanandan Ramalingam, Vivian Hecht
+- Blog post: Chang M. Yun, Vivekanandan Ramalingam, Vivian Hecht _(equal contributions)_
 {{< /summary >}}
 
 ---
 
-> This post is one of a series of blogs we will be releasing on the “ENCODE Deep Learning Collection”. We plan to release the following posts:
+> This post is one of a series of blogs we will be releasing on the ENCODE Deep Learning Collection ("BPNet-GARDEN"). We plan to release the following posts:
 > 1. Overview: What is the ENCODE Deep Learning Collection?
 > 1. **Quickstart guide : How to access the ENCODE Deep Learning Collection (this post)**
 > 1. Understanding regulatory DNA using deep learning models
