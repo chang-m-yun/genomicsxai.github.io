@@ -160,6 +160,8 @@ In the following section, we share an example in the MYC locus to showcase the p
 ## Case study: Regulation in the MYC locus through the lens of deep learning models
 The Myc family of proteins is a set of transcription factors that play an important role in cell proliferation, and mutations in the MYC gene have been shown to lead to many different types of cancer. Thus, understanding the mechanisms of regulation at the MYC locus with base-pair resolution can allow us to answer important questions relating to disease biology, Below, we view a CRISPRi-validated distal enhancer in the MYC locus [chr8:127,898,412—127,899,647] through the lens of 15 different models.
 
+![Figure 1](MYC_fig0.png "width=600 MYC locus with a CRISPRi-validated distal enhancer [chr8:127,898,412—127,899,647] and its experimentally observed DNase-seq signal in K562.")
+
 First, examining chromatin accessibility through ChromBPNet models: the models recapitulate the observed experimental profile with high concordance. Further, the models can de-noise the profile to isolate the true underlying accessibility signal, reconciling DNase and ATAC-seq experimental methods into agreement (where raw signals can diverge due to enzyme differences).
  
 ![Figure 2](MYC_fig2.png "width=600 Observed, model-predicted, and model-corrected DNase-seq and ATAC-seq profiles by ChromBPNet.")
