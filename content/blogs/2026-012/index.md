@@ -1,5 +1,5 @@
 ---
-post_id: "2026-009"
+post_id: "2026-012"
 title: "BPNet-GARDEN: A collection of BPNet-style models trained across ENCODE"
 
 # Optional: image filename "your-image.png" in the same folder
@@ -54,15 +54,15 @@ labs: ["Kundaje Lab"]
 status: "submitted"
 revision: 1
 
-date_submitted: 2026-07-06
+date_submitted: 2026-07-23
 date_accepted: 
-date: 2026-07-06
+date: 2026-07-23
 
 doi: ""
 zenodo_url: ""
 revision_history:
   - version: 1
-    date: 2026-07-06
+    date: 2026-07-23
     notes: "Initial submission"
     # Optional: version-specific DOI / Zenodo record link
     doi: ""
@@ -81,6 +81,7 @@ In this first post of a broader series, we introduce BPNet-GARDENthe ENCODE Deep
 - Blog post: Chang M. Yun, Vivekanandan Ramalingam, Vivian Hecht (equal contributions)
 {{< /summary >}}
 
+---
 > This post is the first of a series of blogs we will be releasing on the “ENCODE Deep Learning Collection”. We plan to release the following posts:
 > 1. **Overview: What is the ENCODE Deep Learning Collection? (this post)**
 > 1. Quickstart guide : How to access the ENCODE Deep Learning Collection

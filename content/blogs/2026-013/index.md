@@ -1,5 +1,5 @@
 ---
-post_id: "2026-010"
+post_id: "2026-013"
 title: "ENCODE 4: A quick-start guide (5 min)"
 
 # Optional: image filename "your-image.png" in the same folder
@@ -54,15 +54,15 @@ labs: ["Kundaje Lab"]
 status: "submitted"
 revision: 1
 
-date_submitted: 2026-07-06
+date_submitted: 2026-07-23
 date_accepted: 
-date: 2026-07-06
+date: 2026-07-23
 
 doi: ""
 zenodo_url: ""
 revision_history:
   - version: 1
-    date: 2026-07-06
+    date: 2026-07-23
     notes: "Initial submission"
     # Optional: version-specific DOI / Zenodo record link
     doi: ""
@@ -81,6 +81,18 @@ For quick and easy introduction to the latest ENCODE 4 deep learning models, we 
 {{< /summary >}}
 
 ---
+
+> This post is one of a series of blogs we will be releasing on the “ENCODE Deep Learning Collection”. We plan to release the following posts:
+> 1. Overview: What is the ENCODE Deep Learning Collection?
+> 1. **Quickstart guide : How to access the ENCODE Deep Learning Collection (this post)**
+> 1. Understanding regulatory DNA using deep learning models
+> 1. A guide to the DECODE BPNet model resource for modeling TF binding
+> 1. A guide to the DECODE ChromBPNet resource for modeling chromatin accessibility
+> 1. Case study #1: Predicting the effects of non-coding variant mutations
+> 1. Case study #2: MotifCompendium: A unified lexicon of regulatory sequence motifs
+> 1. Case study #3: Understanding cell type-specific activity of cis-regulatory elements
+> 1. Postscript: successfully running production-scale projects in an academic setting
+
 ## Quick-start guide (5 min)
 Below, we review the basics of navigating an ENCODE model annotation page and explain how to load the most commonly used resource files into the WashU genome browser. 
 We recommend visualizing the files as a first step in designing any larger-scale quantitative analyses.
