@@ -1,6 +1,6 @@
 ---
 post_id: "2026-012"
-title: "BPNet-GARDEN: A collection of BPNet-style models trained across ENCODE"
+title: "dENCODE: Decoding the sequence basis of gene regulation across ENCODE with thousands of light-weight deep learning models"
 
 # Optional: image filename "your-image.png" in the same folder
 image: "encode_logo.png"
@@ -71,8 +71,8 @@ revision_history:
 
 {{< summary >}}
 The Encyclopedia of DNA Elements (ENCODE) provides a reference map of functional elements in the human genome. This work reflects more than two decades of systematic investigation into genome function and is described in our recent manuscript on the fourth and final phase of the [**ENCODE Project**](https://doi.org/10.64898/2026.07.06.731365).
-As part of this effort, we developed BPNet-GARDEN (BPNet-style reGulAtory DNA deep learning models trained on ENCODE)deep learning models trained on approximately 4,000 datasets spanning multiple layers of gene regulation, including transcription-factor binding, chromatin accessibility, transcription initiation, and regulatory activity. Along with the trained models, we provide model predictions, sequence-interpretation scores, discovered motifs, and their genomic instances to support a wide range of gene-regulatory analyses.
-In this first post of a broader series, we introduce BPNet-GARDENand illustrate how it can be used to uncover the sequence rules underlying gene regulation. Over the coming weeks, we will share additional articles highlighting other applications of this resource.
+As part of this effort, we developed dENCODE–a collection of approximately 4,000 deep learning models deep trained on datasets spanning multiple layers of gene regulation, including transcription-factor binding, chromatin accessibility, transcription initiation, and regulatory activity. Along with the trained models, we provide model predictions, sequence-interpretation scores, discovered motifs, and their genomic instances to support a wide range of gene-regulatory analyses.
+In this first post of a broader series, we introduce dENCODE and illustrate how it can be used to uncover the sequence rules underlying gene regulation. Over the coming weeks, we will share additional articles highlighting other applications of this resource.
 **Contributions**:
 - Primary contributors: Vivekanandan Ramalingam, Chang M. Yun, Vivian Hecht, Aman Patel, Anusri Pampari, Ziwei Chen, Johannes Linder
 - Secondary contributors: Georgi K. Marinov, Kelly Cochran, Abhimanyu Banerjee, Surag Nair, Salil S. Deshpande, Zahoor Zafrulla
@@ -81,8 +81,8 @@ In this first post of a broader series, we introduce BPNet-GARDENand illustrate 
 - Blog post: Chang M. Yun, Vivekanandan Ramalingam, Vivian Hecht _(equal contributions)_
 {{< /summary >}}
 
-> This post is the first of a series of blogs we will be releasing on the ENCODE Deep Learning Collection ("BPNet-GARDEN"). We plan to release the following posts:
-> 1. **Overview: What is the ENCODE Deep Learning Collection? (this post)**
+> This post is the first of a series of blogs we will be releasing on dENCODE. We plan to release the following posts:
+> 1. **dENCODE: Decoding the sequence basis of gene regulation across ENCODE with thousands of light-weight deep learning models (this post)**
 > 1. Quickstart guide : How to access the ENCODE Deep Learning Collection
 > 1. Understanding regulatory DNA using deep learning models
 > 1. A guide to the DECODE BPNet model resource for modeling TF binding
@@ -94,9 +94,9 @@ In this first post of a broader series, we introduce BPNet-GARDENand illustrate 
 
 ---
 ## DNA: not just genes
-The human genome contains approximately 3.2 billion base pairs of DNA. While we often think of genes as the primary component of DNA, they account for only 1-2% of the genome. Gene expression, the process by which genes are converted into functional products, is a highly regulated process–genes are expressed at varying rates, and sometimes not at all–that is fundamental to the function of all living things. Many portions of the 98% of DNA not containing genes, also known as non-coding DNA, play a major role in regulating gene expression, as do the higher-order organization of DNA and various proteins that bind to it. 
+The human genome contains approximately 3.2 billion base pairs of DNA. While we often think of genes coding for proteins as the primary component of DNA, they account for only 1-2% of the genome. Gene expression, the process by which genes are converted into RNA, is a highly regulated process–genes are expressed at varying rates, and sometimes not at all–that is fundamental to the function of all living things. Many portions of the 98% of DNA not containing genes, also known as non-coding DNA, play a major role in regulating gene expression, as do the higher-order organization of DNA and various proteins that bind to it. 
 
-DNA is packaged with proteins into chromatin and further organized into higher-order structures., Chromatin includes structural proteins as well as transcription factors (TFs), or proteins that bind to DNA to up- or down-regulate gene expression. Similarly to thread wound around a spool, not all chromatin is accessible at all times, and binding of various TFs both influences and is determined by chromatin accessibility. Chromatin is highly cell- and species-specific, and plays an essential role in cell differentiation and responses to environmental stimuli such as nutrient stress; moreover, chromatin dysregulation can lead to improper interactions between regulatory elements and genes, which can in turn lead to cancer and other diseases. 
+DNA is packaged with proteins into chromatin and further organized into higher-order structures. Regulatory proteins, such as transcription factors (TFs), bind to DNA, then up- or down-regulate gene expression by further recruiting proteins involved in transcription. Similarly to thread wound around a spool, not all chromatin is accessible at all times, and binding of various TFs both influences and is determined by the accessibility of chromatin. Chromatin is highly cell- and species-specific, and plays an essential role in cell differentiation and responses to environmental stimuli such as nutrient stress; moreover, chromatin dysregulation can lead to improper interactions between regulatory elements and genes, which can in turn lead to cancer and other diseases. 
  
 ## ENCODE: An Encyclopedia of DNA Elements
 The [**Encyclopedia of DNA Elements** (**ENCODE**) Consortium](https://www.encodeproject.org/), a public research project dedicated to building a comprehensive "Encyclopedia" of genome-wide regulatory elements has made major contributions towards characterizing the complex and diverse components of the regulatory landscape. We describe a few of the experimental methods that researchers in the field have developed to interrogate chromatin accessibility below.
@@ -113,19 +113,22 @@ In addition to chromatin accessibility and transcription factor binding, gene ex
  
 And **MPRAs** and related high throughput reporter assays are used to experimentally measure whether particular sequences are in fact responsible for regulating gene expression. In general, in reporter assays, a candidate Cis-Regulatory Element, or cCRE, is inserted into a short sequence which also includes a measurable reporter output, such as a fluorescent molecule, or sequence barcodes in case of the high throughput versions. The greater the level of the measured reporter, the more active the regulatory element.
 
-ENCODE has developed a set of approximately 16,000 standardized, uniformly processed datasets for the assays described above and many others, across a wide range of cell lines, primary cells and tissues. These are organized and publicly available for download via the [ENCODE portal](https://encodeproject.org). The consortium recently released a preprint describing the newly included datasets in the fourth and final phase of the project [ENCODE 4](https://www.biorxiv.org/content/10.64898/2026.07.06.731365v1).
+ENCODE has developed a set of approximately 16,000 standardized, uniformly processed datasets for the assays described above and many others, across a wide range of cell lines, primary cells and tissues. These are organized and publicly available for download via the [ENCODE portal](https://encodeproject.org). 
+
+[Used the assays to map ~4 million candidate cis-regulatory elements: Explain cCRE, Enhancer, Promoter.]
+The consortium recently released a preprint describing the newly included datasets in the fourth and final phase of the project [ENCODE 4](https://www.biorxiv.org/content/10.64898/2026.07.06.731365v1).
 
 ![Figure: ENCODE cube](ENCODE_cube.png "width=600 Coverage of the ENCODE Project: 100s of biochemical markers, performed in 100s of cell types and tissues, measured across 3 billion genomic positions. From Roadmap Epigenomics Consortium et al. Integrative analysis of 111 reference human epigenomes. Nature 518, 317–330 (2015). (https://doi.org/10.1038/nature14248)")
 Coverage of the ENCODE Project: hundreds of biochemical markers, performed in hundreds of cell types and tissues, measured across 3 billion genomic positions. From _Roadmap Epigenomics Consortium et al. Integrative analysis of 111 reference human epigenomes. Nature 518, 317–330 (2015). ([https://doi.org/10.1038/nature14248](https://doi.org/10.1038/nature14248))_
- 
-## The BPNet family of deep learning models can help uncover the mechanisms of regulation
-However, while the signals from the experimental assays can help map the locations of active regulatory genomic elements, they do provide limited mechanistic insights, and we are left with some fundamental questions, for example:
+
+However, while the experimental assays can help map the locations of active regulatory genomic elements, they provide limited mechanistic insights, and we are left with some fundamental questions, for example:
 
 - *Which sequence features drive TF binding and chromatin accessibility? 
 - *How do combinations and arrangements of motifs influence TF occupancy? 
 - *What would happen if an individual nucleotide were altered? 
 - *Is a disease-causing mutation causing its effect via changes to a transcription factor binding site?
-
+ 
+## The BPNet family of deep learning models uncovers the quantitative role of sequence in regulation
 Our group has developed a suite of deep learning models and downstream tools to address these questions. They include:
 - **BPNet:** A convolutional neural network (CNN) trained on TF-ChIP-seq that predicts the binding of a TF from DNA sequence;
 - **ChromBPNet:** A CNN with a BPNet-like architecture trained on DNase- or ATAC-seq that predicts chromatin accessibility from DNA sequence and corrects for enzymatic bias;
@@ -145,11 +148,11 @@ DNase and ATAC-seq suffer from unwanted artifacts related to the preference of D
 
 ![Figure: Remove bias](BPNet_Fig2.gif "width=600 Remove the effects of unwanted experimental artifacts, by training a separate model to predict the experimental effects then subtracting it from the total signal.")
 
-**2.** We next interpret the weights of the trained model to understand which positions in the training sequences were most important to its predictions using DeepLIFT (ref). The most important positions, and bases at those positions, can often be directly attributed to the sequence binding preference of known transcription factors.   
+**2.** We next interpret the relative activations of the trained model to understand which positions in the training sequences were most important to its predictions using DeepLIFT (ref). The most important positions, and bases at those positions, can often be directly attributed to the sequence binding preference of known transcription factors.   
 
 ![Figure: Interpret the model](BPNet_Fig4.gif "width=600 Identify highly contributing bases used by the model during prediction.")
 
-**3.** Once we have the sequence interpretations we use a suite of post-processing tools to extract, consolidate and cluster the potential transcription factor binding sites. We also map the sites back to the genome, which is very useful for downstream quantitative analyses. 
+**3.** Once we have the sequence interpretations, we use a suite of post-processing tools to extract, consolidate and cluster the potential transcription factor binding sites. We also map the sites back to the genome, which is very useful for downstream quantitative analyses. 
 
 An example application, shown below, is to predict the effect of potentially disease-causing mutations in the genome. We can run predictions on mutations at any genomic sequence, even ones on which the model has not been trained, and calculate a log-fold change in signal, which can then be related to the mutation effect size. 
 
@@ -187,8 +190,9 @@ Through the power of the models and the richness of the ENCODE dataset, we hope 
 As part of the ENCODE Project, all data, models, analysis are available at the [Project portal](https://www.encodeproject.org/). If you use our models, please cite the [ENCODE preprint](https://doi.org/10.64898/2026.07.06.731365). 
 
 Beyond the ENCODE portal, we provide several user-friendly alternatives for accessing and visualizing our data: 
-- **Models**: We have uploaded the models for open access on [**Hugging Face**](https://huggingface.co/collections/kundajelab/encode-bpnet-models)
-- **Predictions, contributions, and instances**: We have created a [**UCSC Track Hub**](https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&hubUrl=https://kundajelab.github.io/ucsc-trackhub-encode.github.io/hub.txt) for easy, interactive browser sessions
+- **Models**: We have uploaded the models for open access on the [ENCODE Portal](https://www.encodeproject.org/{ADD}) and on [**Hugging Face**](https://huggingface.co/collections/kundajelab/encode-bpnet-models)
+- **Predictions**: We have created browser-friendly tracks of all model predictions in experimental peaks, as a [**UCSC Track Hub**](https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&hubUrl=https://kundajelab.github.io/ucsc-trackhub-encode.github.io/hub.txt) for easy, interactive browser sessions
+- **Sequence annotations**: We have identified highly contributing bases for all models and annotated the likely corresponding TF, as a [**UCSC Track Hub**](https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&hubUrl=https://kundajelab.github.io/ucsc-trackhub-encode.github.io/hub.txt) for easy, interactive browser sessions
 - **User guide**: We are currently building an _interactive_ user guide to help the community navigate and explain the resource (_work in progress_)
 - **Preprint**: For more detail, the latest ENCODE preprint is out on [_bioRxiv_](https://doi.org/10.64898/2026.07.06.731365)
  

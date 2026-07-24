@@ -1,6 +1,6 @@
 ---
 post_id: "2026-013"
-title: "BPNet-GARDEN: A quick-start guide (5 min)"
+title: "dENCODE: A quick-start guide (5 min)"
 
 # Optional: image filename "your-image.png" in the same folder
 image: "MYC_fig1.png"
@@ -68,7 +68,6 @@ revision_history:
     doi: ""
     zenodo_url: ""
 ---
-
 {{< summary >}}
 For quick and easy introduction to the latest ENCODE 4 deep learning models, we provide a **Quick-start guide** (5 min). Following the instructions, you should be able to create an **interactive genome browser session** to view a model's outputs, including experimentally observed signal, model-predicted signal, sequence contribution scores, and genomic motif instances.
 
@@ -81,9 +80,8 @@ For quick and easy introduction to the latest ENCODE 4 deep learning models, we 
 {{< /summary >}}
 
 ---
-
-> This post is one of a series of blogs we will be releasing on the ENCODE Deep Learning Collection ("BPNet-GARDEN"). We plan to release the following posts:
-> 1. Overview: What is the ENCODE Deep Learning Collection?
+> This post is one of a series of blogs we will be releasing on dENCODE (Deep learning models trained across ENCODE). We plan to release the following posts:
+> 1. dENCODE: Decoding the sequence basis of gene regulation across ENCODE with thousands of light-weight deep learning models
 > 1. **Quickstart guide : How to access the ENCODE Deep Learning Collection (this post)**
 > 1. Understanding regulatory DNA using deep learning models
 > 1. A guide to the DECODE BPNet model resource for modeling TF binding
